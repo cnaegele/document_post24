@@ -16,5 +16,25 @@ export const data = defineStore({
             groupeSecurite: ref(''),
             bInGroupe: ref(0),
         },
+        file: ref(null),
+        document: {
+            idFamille: ref(0),
+            famille: ref(''),
+            idType: ref(0),
+            type: ref(''),
+            titre: ref(''),
+            sujet: ref(''),
+            description: ref(''),
+            commentaire: ref(''),
+            dateOfficielle: ref(''),
+        },
+        messagesErreur: {
+            bSnackbar: ref(false),
+            timeOutSnackbar: ref(10000),
+            messageSnackbar: ref(''),
+            dateDebut: ref(''),
+            dateFin: ref(''),
+            serverbackend: ref(''),
+        }, 
     })
 })
