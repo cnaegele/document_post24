@@ -18,9 +18,9 @@ export const data = defineStore({
         },
         file: ref(null),
         document: {
-            idFamille: ref(0),
+            idFamille: ref(''),
             famille: ref(''),
-            idType: ref(0),
+            idType: ref(''),
             type: ref(''),
             titre: ref(''),
             sujet: ref(''),

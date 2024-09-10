@@ -7,6 +7,23 @@
 </style>
 
 <template>
+  <v-snackbar
+    color="#FFCDD2"
+    multi-line
+    location="center"
+    v-model="lesDatas.messagesErreur.bSnackbar"
+    :timeout="lesDatas.messagesErreur.timeOutSnackbar"
+  >
+    <div v-html="lesDatas.messagesErreur.messageSnackbar"></div>
+    <template v-slot:actions>
+      <v-btn
+        text="Fermer"
+        variant="tonal"
+        @click="lesDatas.messagesErreur.bSnackbar = false"
+      ></v-btn>
+    </template>
+  </v-snackbar>
+
   <AppToper />
   <v-container>
     <v-row dense>
@@ -31,11 +48,26 @@
     <v-row dense>
       <v-col cols="12" md="2" class="titreChampSaisie">Famille</v-col>
         <v-col cols="12" md="3">
-          ...
+            <v-select
+                v-model="lesDatas.document.idFamille"
+                :items="itemsFamille"
+                label="famille"
+                item-title="label"
+                :reduce="(item) => itemsFamille.value"
+                placeholder="Sélectionner la famille du document"
+            ></v-select>                     
         </v-col>
-        <v-col cols="12" md="4" class="titreChampSaisie">Type</v-col>
+        <v-col cols="12" md="1"></v-col>
+        <v-col cols="12" md="1" class="titreChampSaisie">Type</v-col>
         <v-col cols="12" md="2">
-          ...
+            <v-select
+                v-model="lesDatas.document.idType"
+                :items="itemsType"
+                label="type"
+                item-title="label"
+                :reduce="(item) => itemsType.value"
+                placeholder="Sélectionner le type du document"
+            ></v-select>                     
         </v-col>
     </v-row>
     <v-row dense>
@@ -86,8 +118,28 @@
   </template>
   
  <script setup>
-import { ref, watch } from 'vue'
+import { ref, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
+import { documentPostProps } from './DocumentPostProps.js'
+
+const props = defineProps(documentPostProps)
+const { famillestypes } = toRefs(props)
+const { sizemax } = toRefs(props)
+
+console.log(famillestypes.value)
+console.log(sizemax.value)
+
+const itemsFamille = ref([])
+const itemsType = ref([])
+let itemF
+for (let i=0; i<famillestypes.value.length; i++) {
+    itemF = {
+        id: famillestypes.value[i].id,
+        label: famillestypes.value[i].label,
+        value: famillestypes.value[i].value,
+    }
+    itemsFamille.value.push(itemF)
+}
 
 const lesDatas = data()
 const messagesErreurDateDebut = ref('')
@@ -121,6 +173,24 @@ watch(() => lesDatas.document.dateOfficielle, () => {
     messagesErreurDateDebut.value = ''
     if (lesDatas.document.dateOfficielle === '') {
         messagesErreurDateDebut.value = 'la date officielle est obligatoire ou signalée inconnue'   
+    }
+})
+
+watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
+    itemsType.value = []
+    let itemT
+    for (let i=0; i<famillestypes.value.length; i++) {
+        if (famillestypes.value[i].value == newValueF) {
+            for (let j=0; j<famillestypes.value[i].type.length; j++) {
+                itemT = {
+                    id: famillestypes.value[i].type[j].id,
+                    label: famillestypes.value[i].type[j].label,
+                    value: famillestypes.value[i].type[j].value,
+                }
+                itemsType.value.push(itemT)
+            }
+        break;    
+        }
     }
 })
 </script>
