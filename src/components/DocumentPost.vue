@@ -121,10 +121,17 @@
 import { ref, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
+import { verifieNouveauMD5 } from '@/sauve.js'
 
+const lesDatas = data()
 const props = defineProps(documentPostProps)
 const { famillestypes } = toRefs(props)
 const { sizemax } = toRefs(props)
+lesDatas.document.sizemax = sizemax
+const { titre } = toRefs(props)
+lesDatas.document.titre = ref(titre)
+const { sujet } = toRefs(props)
+lesDatas.document.sujet = ref(sujet)
 
 console.log(famillestypes.value)
 console.log(sizemax.value)
@@ -141,7 +148,6 @@ for (let i=0; i<famillestypes.value.length; i++) {
     itemsFamille.value.push(itemF)
 }
 
-const lesDatas = data()
 const messagesErreurDateDebut = ref('')
 
 const titreRules = [
@@ -191,6 +197,77 @@ watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
             }
         break;    
         }
+    }
+    
+    if (lesDatas.file !== null) {
+        let bTrouve = false
+        let fileExtension = ''
+        const posi = lesDatas.file.name.lastIndexOf('.')
+        if (posi !== -1) {
+            fileExtension = lesDatas.file.name.substr(posi+1)
+            for (let i=0; i<itemsType.value.length; i++) {
+                if (itemsType.value[i].label == fileExtension) {
+                    lesDatas.document.idType = itemsType.value[i].value
+                    bTrouve = true
+                    break   
+                }
+            }
+        }
+        if (!bTrouve) {
+            lesDatas.document.idType = ''
+            lesDatas.messagesErreur.timeOutSnackbar = 10000
+            lesDatas.messagesErreur.bSnackbar = true
+            lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
+       }    
+    }
+})
+
+watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
+    if (lesDatas.file !== null) {
+        let fileExtension = ''
+        const posi = lesDatas.file.name.lastIndexOf('.')
+        if (posi !== -1) {
+            fileExtension = lesDatas.file.name.substr(posi+1)
+            for (let i=0; i<itemsType.value.length; i++) {
+                if (itemsType.value[i].value == newValueT) {
+                    if (itemsType.value[i].label !== fileExtension) {
+                        lesDatas.messagesErreur.timeOutSnackbar = 10000
+                        lesDatas.messagesErreur.bSnackbar = true
+                        lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) ne correspond pas au type choisi (${itemsType.value[i].label})`
+                    }
+                    break   
+                }
+            }
+        }
+    }
+})
+
+watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
+    if (newValueFile !== undefined && lesDatas.document.idFamille !== '') {
+        let bTrouve = false
+        let fileExtension = ''
+        const posi = newValueFile.name.lastIndexOf('.')
+        if (posi !== -1) {
+            fileExtension = newValueFile.name.substr(posi+1)
+            for (let i=0; i<itemsType.value.length; i++) {
+                if (itemsType.value[i].label == fileExtension) {
+                    lesDatas.document.idType = itemsType.value[i].value
+                    bTrouve = true
+                    break   
+                }
+            }
+        }
+        if (!bTrouve) {
+            lesDatas.document.idType = ''
+            lesDatas.messagesErreur.timeOutSnackbar = 10000
+            lesDatas.messagesErreur.bSnackbar = true
+            lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
+       }    
+    }
+
+    if(newValueFile !== undefined) {
+         //On vérifie que le fichier n'a pas déjà été indexé sur goéland
+         verifieNouveauMD5()       
     }
 })
 </script>

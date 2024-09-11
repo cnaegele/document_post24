@@ -14,7 +14,7 @@
         <v-toolbar-title>Document indexation</v-toolbar-title>
     
 
-        <v-tooltip text="indexer le document" v-if="lesDatas.file !== null">
+        <v-tooltip text="indexer le document" v-if="lesDatas.file !== null && lesDatas.bdataOK">
             <template v-slot:activator="{ props }">
                 <v-btn
                     v-bind="props"

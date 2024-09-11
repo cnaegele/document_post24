@@ -28,6 +28,9 @@ export const data = defineStore({
             commentaire: ref(''),
             dateOfficielle: ref(''),
         },
+        controle: {
+            bDataFileOK: ref(true)
+        },
         messagesErreur: {
             bSnackbar: ref(false),
             timeOutSnackbar: ref(10000),
@@ -36,5 +39,17 @@ export const data = defineStore({
             dateFin: ref(''),
             serverbackend: ref(''),
         }, 
-    })
+    }),
+    getters: {
+        bdataOK: (state)  => {
+            if (state.controle.bDataFileOK 
+                //&& state.controle.bdataGenDateDebutOK
+                //&& state.controle.bdataGenDateFinOK
+            ) {
+                return true
+            } else {
+                return false
+            }
+        }  
+    }    
 })

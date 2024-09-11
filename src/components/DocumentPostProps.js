@@ -45,10 +45,22 @@ export const documentPostProps = {
         ]
       }
     },
+    titre: {
+      type: String,
+      default() {
+        return ''
+      } 
+    },
+    sujet: {
+      type: String,
+      default() {
+        return ''
+      } 
+    },
     sizemax: {
       type: Number,
       default() {
-        return 6000000
+        return 10000000
       }
     }
   }
