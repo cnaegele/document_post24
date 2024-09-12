@@ -100,7 +100,7 @@
     </v-row>
     <v-row >
         <v-col cols="12" md="2" class="titreChampSaisie">Date officielle</v-col>
-        <v-col cols="12" md="10">
+        <v-col cols="12" md="3">
             <div class="go_divdate">
                 <input
                     type="date"
@@ -112,6 +112,45 @@
                 <span class="go-erreur">&nbsp;&nbsp;&nbsp;&nbsp;{{ messagesErreurDateDebut }}</span>
             </div>
         </v-col>
+        <v-col cols="12" md="2">
+            <v-checkbox 
+                label="inconnue"
+                v-model="bDateOfficielleInconnue"
+            ></v-checkbox>
+        </v-col>
+    </v-row>
+    <v-row >
+        <v-col cols="12" md="2" class="titreChampSaisie">Auteur</v-col>
+        <v-col cols="12" md="10">
+            <div>
+                <v-radio-group inline v-model="lesDatas.document.documentIntExt">
+                    <v-radio label="document interne" value="docInterne"></v-radio>
+                    <v-radio label="document externe" value="docExterne"></v-radio>
+                </v-radio-group>
+            </div>
+            <div v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
+                <v-btn rounded="xl" class="text-none" @click="bChoixEmploye=!bChoixEmploye">Choix employé</v-btn>
+            </div>
+            <div v-if="bChoixEmploye">
+                <Suspense>
+                    <EmployeChoix 
+                        uniteHorsVdL="non" 
+                        :modeChoix="'unique'"
+                        @choixEmploye="receptionEmploye"
+                    />
+                </Suspense>
+            </div>
+            <div v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
+                <v-btn rounded="xl" class="text-none">Choix acteur(s)</v-btn>
+            </div>
+            <div>
+                <v-checkbox 
+                    label="inconnu"
+                    v-model="bAuteurInconnu"
+                ></v-checkbox>
+            </div>
+
+        </v-col>
     </v-row>
 
   </v-container>
@@ -122,6 +161,7 @@ import { ref, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { verifieNouveauMD5 } from '@/sauve.js'
+import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 
 const lesDatas = data()
 const props = defineProps(documentPostProps)
@@ -133,8 +173,6 @@ lesDatas.document.titre = ref(titre)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = ref(sujet)
 
-console.log(famillestypes.value)
-console.log(sizemax.value)
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -147,6 +185,12 @@ for (let i=0; i<famillestypes.value.length; i++) {
     }
     itemsFamille.value.push(itemF)
 }
+
+const bDateOfficielleInconnue = ref(false)
+const bAuteurInconnu = ref(false)
+const bAuteurInterne = ref(true)
+const bAuteurExterne = ref(false)
+const bChoixEmploye = ref(false)
 
 const messagesErreurDateDebut = ref('')
 
@@ -177,7 +221,7 @@ watch(() => lesDatas.document.dateOfficielle, () => {
     //Comme on utilise pas un composant vuetify
     //if faut faire l'equivalent des rules ici
     messagesErreurDateDebut.value = ''
-    if (lesDatas.document.dateOfficielle === '') {
+    if (lesDatas.document.dateOfficielle === '' && !bDateOfficielleInconnue.value) {
         messagesErreurDateDebut.value = 'la date officielle est obligatoire ou signalée inconnue'   
     }
 })
@@ -270,4 +314,17 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
          verifieNouveauMD5()       
     }
 })
+
+watch(() => bDateOfficielleInconnue.value, () => {
+    if (bDateOfficielleInconnue.value) {
+        lesDatas.document.dateOfficielle = ''
+    } else if (lesDatas.document.dateOfficielle === '') {
+        messagesErreurDateDebut.value = 'la date officielle est obligatoire ou signalée inconnue'         
+    }
+})
+
+const receptionEmploye = (idemploye, jsonData) => {
+    bChoixEmploye.value = false
+    console.log(jsonData)
+}
 </script>
