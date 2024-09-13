@@ -27,7 +27,14 @@ export const data = defineStore({
             description: ref(''),
             commentaire: ref(''),
             dateOfficielle: ref(''),
-            documentIntExt: ref('docInterne')
+            documentIntExt: ref('docInterne'),
+            idEmployeAuteur: ref(0),
+            acteurAuteur: ref([]),
+            niveauConfidentialite: ref('1')
+            /*
+                id: ref(0),
+                nom: ref('')
+            */
         },
         controle: {
             bDataFileOK: ref(true)

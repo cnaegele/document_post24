@@ -6,6 +6,15 @@ if (import.meta.env.DEV) {
 }
 const g_pathurl = '/goeland/document/axios/'
 
+export async function getDicoNiveauConfidentialite() {
+    const urldnc = `${g_devurl}${g_pathurl}document_niveauconfidentialite_dico.php`
+    const response = await axios.get(urldnc)
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
 export async function documentListeParMD5(strMD5) {
     const urldlm = `${g_devurl}${g_pathurl}document_liste_parmd5.php`
     const params = new URLSearchParams([['md5', strMD5]])

@@ -51,7 +51,6 @@
             <v-select
                 v-model="lesDatas.document.idFamille"
                 :items="itemsFamille"
-                label="famille"
                 item-title="label"
                 :reduce="(item) => itemsFamille.value"
                 placeholder="Sélectionner la famille du document"
@@ -63,7 +62,6 @@
             <v-select
                 v-model="lesDatas.document.idType"
                 :items="itemsType"
-                label="type"
                 item-title="label"
                 :reduce="(item) => itemsType.value"
                 placeholder="Sélectionner le type du document"
@@ -98,7 +96,7 @@
             ></v-textarea>                        
         </v-col>
     </v-row>
-    <v-row >
+    <v-row dense>
         <v-col cols="12" md="2" class="titreChampSaisie">Date officielle</v-col>
         <v-col cols="12" md="3">
             <div class="go_divdate">
@@ -119,29 +117,62 @@
             ></v-checkbox>
         </v-col>
     </v-row>
-    <v-row >
-        <v-col cols="12" md="2" class="titreChampSaisie">Auteur</v-col>
+    <v-row dense>
+        <v-col cols="12" md="2" class="titreChampSaisie">
+            <span>Auteur&nbsp;&nbsp;</span>
+            <span v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixEmploye=!bChoixEmploye">Choix employé</v-btn>
+            </span>
+            <span v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixActeur=!bChoixActeur">Choix acteur(s)</v-btn>
+            </span>
+       </v-col>
         <v-col cols="12" md="10">
             <div>
-                <v-radio-group inline v-model="lesDatas.document.documentIntExt">
+                <v-radio-group inline hide-details="true" v-model="lesDatas.document.documentIntExt">
                     <v-radio label="document interne" value="docInterne"></v-radio>
                     <v-radio label="document externe" value="docExterne"></v-radio>
                 </v-radio-group>
             </div>
             <div v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
-                <v-btn rounded="xl" class="text-none" @click="bChoixEmploye=!bChoixEmploye">Choix employé</v-btn>
+                &nbsp;&nbsp;&nbsp;&nbsp;{{ txtEmployeAuteur }}
+            </div>
+            <div v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
+                <v-container v-if="lesDatas.document.acteurAuteur.length > 0">
+                    <v-row v-for="(acteurAuteur, index) in lesDatas.document.acteurAuteur" :key="acteurAuteur.idActeur" dense class="d-flex align-center">
+                        <v-col cols="12" md="1">
+                            <v-tooltip text="supprimer cet auteur">
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                v-bind="props"
+                                icon="mdi-delete"
+                                variant="text"
+                                @click="supprimeActeurAuteur(acteurAuteur.id)"
+                                ></v-btn>
+                            </template>        
+                            </v-tooltip>
+                        </v-col>  
+                        <v-col cols="12" md="11">{{ acteurAuteur.nom }}</v-col>
+                    </v-row>    
+                </v-container>
             </div>
             <div v-if="bChoixEmploye">
                 <Suspense>
                     <EmployeChoix 
                         uniteHorsVdL="non" 
                         :modeChoix="'unique'"
-                        @choixEmploye="receptionEmploye"
+                        @choixEmploye="receptionEmployeAuteur"
                     />
                 </Suspense>
             </div>
-            <div v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
-                <v-btn rounded="xl" class="text-none">Choix acteur(s)</v-btn>
+            <div v-if="bChoixActeur">
+                <ActeurChoix 
+                    critereTypeInit="nom"
+                    nombreMaximumRetour="50"
+                    :modeChoix="'unique'"
+                    @choixActeur="receptionActeurAuteur"
+                    >
+                    </ActeurChoix>
             </div>
             <div>
                 <v-checkbox 
@@ -149,10 +180,20 @@
                     v-model="bAuteurInconnu"
                 ></v-checkbox>
             </div>
-
         </v-col>
     </v-row>
-
+    <v-row dense>
+      <v-col cols="12" md="2" class="titreChampSaisie">Niveau de confidentialité</v-col>
+        <v-col cols="12" md="5">
+            <v-select
+                v-model="lesDatas.document.niveauConfidentialite"
+                :items="itemsNivConf"
+                item-title="label"
+                :reduce="(item) => itemsNivConf.value"
+                placeholder="Sélectionner le niveau de confidentialité"
+            ></v-select>                     
+        </v-col>
+    </v-row>
   </v-container>
   </template>
   
@@ -160,8 +201,10 @@
 import { ref, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
+import { getDicoNiveauConfidentialite } from '../axioscalls.js'
 import { verifieNouveauMD5 } from '@/sauve.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
+import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 
 const lesDatas = data()
 const props = defineProps(documentPostProps)
@@ -172,7 +215,6 @@ const { titre } = toRefs(props)
 lesDatas.document.titre = ref(titre)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = ref(sujet)
-
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -185,12 +227,16 @@ for (let i=0; i<famillestypes.value.length; i++) {
     }
     itemsFamille.value.push(itemF)
 }
+const itemsNivConf = await getDicoNiveauConfidentialite()
+//console.log(itemsNivConf)
 
 const bDateOfficielleInconnue = ref(false)
 const bAuteurInconnu = ref(false)
 const bAuteurInterne = ref(true)
 const bAuteurExterne = ref(false)
 const bChoixEmploye = ref(false)
+const txtEmployeAuteur = ref('')
+const bChoixActeur = ref(false)
 
 const messagesErreurDateDebut = ref('')
 
@@ -323,8 +369,58 @@ watch(() => bDateOfficielleInconnue.value, () => {
     }
 })
 
-const receptionEmploye = (idemploye, jsonData) => {
+watch(() => bAuteurInconnu.value, () => {
+    if (bAuteurInconnu.value) {
+        lesDatas.document.idEmployeAuteur = 0
+        lesDatas.document.acteurAuteur = []
+    }
+})
+
+watch(() => lesDatas.document.documentIntExt, (newValueDIE) => {
+    if (newValueDIE == 'docExterne') {
+        lesDatas.document.idEmployeAuteur = 0
+        txtEmployeAuteur.value = ''    
+    } else if (newValueDIE == 'docInterne') {
+        lesDatas.document.acteurAuteur = []
+    }
+})
+
+const receptionEmployeAuteur = (idemploye, jsonData) => {
     bChoixEmploye.value = false
+    //console.log(jsonData)
+    const oEmployeAuteur = JSON.parse(jsonData)
+    lesDatas.document.idEmployeAuteur = oEmployeAuteur.idemploye
+    txtEmployeAuteur.value = `${oEmployeAuteur.nom} ${oEmployeAuteur.prenom}. ${oEmployeAuteur.unite}`
+}
+
+const receptionActeurAuteur = (idacteur, jsonData) => {
+    bChoixActeur.value = false
     console.log(jsonData)
+    const oActeurAuteur = JSON.parse(jsonData)
+    if (lesDatas.document.acteurAuteur.length > 0) {
+        for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
+            if (lesDatas.document.acteurAuteur[i].id == oActeurAuteur.acteurid) {
+                return //déjà sélectionné
+            }
+        }
+    }
+    const acteurA = {
+        id: oActeurAuteur.acteurid,
+        nom: oActeurAuteur.acteurnom,
+    }
+    lesDatas.document.acteurAuteur.push(acteurA)
+}
+
+const supprimeActeurAuteur = (idacteur) => {
+   if (lesDatas.document.acteurAuteur.length == 1) {
+        lesDatas.document.acteurAuteur = [] 
+    } else {
+        for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
+            if (lesDatas.document.acteurAuteur[i].id == idacteur) {
+                lesDatas.document.acteurAuteur.splice(i, 1)
+                break  
+            }
+        }       
+    }
 }
 </script>
