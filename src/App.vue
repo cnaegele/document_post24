@@ -3,8 +3,9 @@
     <v-main>
       <Suspense>
         <DocumentPost
-          :sizemax="5000000" 
-          sujet="le sujet" 
+          :sizemax="5000000"
+          titre=""
+          sujet="" 
         ></DocumentPost>
     </Suspense>
     </v-main>

@@ -53,6 +53,7 @@
                 :items="itemsFamille"
                 item-title="label"
                 :reduce="(item) => itemsFamille.value"
+                :rules="familleRules"
                 placeholder="Sélectionner la famille du document"
             ></v-select>                     
         </v-col>
@@ -64,6 +65,7 @@
                 :items="itemsType"
                 item-title="label"
                 :reduce="(item) => itemsType.value"
+                :rules="typeRules"
                 placeholder="Sélectionner le type du document"
             ></v-select>                     
         </v-col>
@@ -107,7 +109,7 @@
                     v-model="lesDatas.document.dateOfficielle"
                     @keyup="inpDateOfficiellekeyup"
                 ></input>
-                <span class="go-erreur">&nbsp;&nbsp;&nbsp;&nbsp;{{ messagesErreurDateDebut }}</span>
+                <span class="go-erreur">&nbsp;&nbsp;&nbsp;&nbsp;{{ messagesErreurDateOfficielle }}</span>
             </div>
         </v-col>
         <v-col cols="12" md="2">
@@ -122,6 +124,8 @@
             <span>Auteur&nbsp;&nbsp;</span>
             <span v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
                 <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixEmploye=!bChoixEmploye">Choix employé</v-btn>
+                <br>    
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="auteurUser">moi</v-btn>
             </span>
             <span v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
                 <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixActeur=!bChoixActeur">Choix acteur(s)</v-btn>
@@ -137,6 +141,7 @@
             <div v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
                 &nbsp;&nbsp;&nbsp;&nbsp;{{ txtEmployeAuteur }}
             </div>
+            <div v-if="!lesDatas.controle.bDataAuteurOK" class="go-erreur">l'auteur est obligatoire ou signalé inconnu</div>
             <div v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
                 <v-container v-if="lesDatas.document.acteurAuteur.length > 0">
                     <v-row v-for="(acteurAuteur, index) in lesDatas.document.acteurAuteur" :key="acteurAuteur.idActeur" dense class="d-flex align-center">
@@ -186,7 +191,7 @@
       <v-col cols="12" md="2" class="titreChampSaisie">Niveau de confidentialité</v-col>
         <v-col cols="12" md="5">
             <v-select
-                v-model="lesDatas.document.niveauConfidentialite"
+                v-model="lesDatas.document.idNiveauConfidentialite"
                 :items="itemsNivConf"
                 item-title="label"
                 :reduce="(item) => itemsNivConf.value"
@@ -195,6 +200,7 @@
         </v-col>
     </v-row>
   </v-container>
+  <AppFooter/>
   </template>
   
  <script setup>
@@ -212,9 +218,9 @@ const { famillestypes } = toRefs(props)
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
 const { titre } = toRefs(props)
-lesDatas.document.titre = ref(titre)
+lesDatas.document.titre = titre.value
 const { sujet } = toRefs(props)
-lesDatas.document.sujet = ref(sujet)
+lesDatas.document.sujet = sujet.value
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -232,20 +238,40 @@ const itemsNivConf = await getDicoNiveauConfidentialite()
 
 const bDateOfficielleInconnue = ref(false)
 const bAuteurInconnu = ref(false)
-const bAuteurInterne = ref(true)
-const bAuteurExterne = ref(false)
 const bChoixEmploye = ref(false)
 const txtEmployeAuteur = ref('')
 const bChoixActeur = ref(false)
 
-const messagesErreurDateDebut = ref('')
+const messagesErreurDateOfficielle = ref('')
 
 const titreRules = [
     value => {
+        lesDatas.controle.bDataTitreOK = false
         if (value.trim().length >= 5) {
+            lesDatas.controle.bDataTitreOK = true
             return true
         }
         return 'Le titre est obligatoire et doit contenir au moins 5 caractères'
+    }
+]
+const familleRules = [
+    value => {
+        lesDatas.controle.bDataFamilleOK = false
+        if (value !== '') {
+            lesDatas.controle.bDataFamilleOK = true
+            return true
+        }
+        return 'choisir une famille' 
+    }
+]
+const typeRules = [
+    value => {
+        lesDatas.controle.bDataTypeOK = false
+        if (value !== '') {
+            lesDatas.controle.bDataTypeOK = true
+            return true
+        }
+        return 'choisir un type' 
     }
 ]
 
@@ -258,17 +284,20 @@ const inpDateOfficiellekeyup = () => {
     //effective de la date qui est vide.
     const inpDate = document.getElementById('inpDateOfficielle')
     if (inpDate.validity.badInput) {
-      messagesErreurDateDebut.value = 'la date officielle est invalide'
+        lesDatas.controle.bDataDateOfficielleOK = false
+        messagesErreurDateOfficielle.value = 'la date officielle est invalide'
     } else {
-      messagesErreurDateDebut.value = ''
+        messagesErreurDateOfficielle.value = ''
     }
 }
 watch(() => lesDatas.document.dateOfficielle, () => {
     //Comme on utilise pas un composant vuetify
     //if faut faire l'equivalent des rules ici
-    messagesErreurDateDebut.value = ''
+    messagesErreurDateOfficielle.value = ''
+    lesDatas.controle.bDataDateOfficielleOK = true
     if (lesDatas.document.dateOfficielle === '' && !bDateOfficielleInconnue.value) {
-        messagesErreurDateDebut.value = 'la date officielle est obligatoire ou signalée inconnue'   
+        lesDatas.controle.bDataDateOfficielleOK = false
+        messagesErreurDateOfficielle.value = 'la date officielle est obligatoire ou signalée inconnue'   
     }
 })
 
@@ -364,8 +393,10 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
 watch(() => bDateOfficielleInconnue.value, () => {
     if (bDateOfficielleInconnue.value) {
         lesDatas.document.dateOfficielle = ''
+        lesDatas.controle.bDataDateOfficielleOK = true
     } else if (lesDatas.document.dateOfficielle === '') {
-        messagesErreurDateDebut.value = 'la date officielle est obligatoire ou signalée inconnue'         
+        lesDatas.controle.bDataDateOfficielleOK = false
+        messagesErreurDateOfficielle.value = 'la date officielle est obligatoire ou signalée inconnue'         
     }
 })
 
@@ -374,6 +405,12 @@ watch(() => bAuteurInconnu.value, () => {
         lesDatas.document.idEmployeAuteur = 0
         lesDatas.document.acteurAuteur = []
     }
+    lesDatas.controle.bDataAuteurOK = true
+    if ((lesDatas.document.acteurAuteur.length == 0 && lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu.value)
+        ||
+        (lesDatas.document.idEmployeAuteur == 0 && lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu.value)) {
+        lesDatas.controle.bDataAuteurOK = false    
+    }    
 })
 
 watch(() => lesDatas.document.documentIntExt, (newValueDIE) => {
@@ -385,6 +422,29 @@ watch(() => lesDatas.document.documentIntExt, (newValueDIE) => {
     }
 })
 
+watch(() => lesDatas.document.idEmployeAuteur, (newValueIdEA) => {
+    lesDatas.controle.bDataAuteurOK = true
+    if (newValueIdEA == 0 && lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu.value) {
+        lesDatas.controle.bDataAuteurOK = false    
+    }    
+})
+
+watch(() => lesDatas.document.acteurAuteur, () => {
+    lesDatas.controle.bDataAuteurOK = true
+    if (lesDatas.document.acteurAuteur.length == 0 && lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu.value) {
+        lesDatas.controle.bDataAuteurOK = false    
+    }    
+}, { deep: true })
+
+const auteurUser = () => {
+    const oEmployeUser = {
+        idemploye: lesDatas.user.idEmployeUser,
+        nom: lesDatas.user.nomEmployeUser,
+        prenom: lesDatas.user.prenomEmployeUser,
+        unite: '',
+    }
+    receptionEmployeAuteur(lesDatas.user.idEmployeUser, JSON.stringify(oEmployeUser))
+}
 const receptionEmployeAuteur = (idemploye, jsonData) => {
     bChoixEmploye.value = false
     //console.log(jsonData)

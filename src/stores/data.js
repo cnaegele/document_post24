@@ -30,30 +30,35 @@ export const data = defineStore({
             documentIntExt: ref('docInterne'),
             idEmployeAuteur: ref(0),
             acteurAuteur: ref([]),
-            niveauConfidentialite: ref('1')
             /*
                 id: ref(0),
                 nom: ref('')
             */
-        },
+                idNiveauConfidentialite: ref('1')
+       },
         controle: {
-            bDataFileOK: ref(true)
+            bDataFileOK: ref(true),
+            bDataTitreOK: ref(true),
+            bDataFamilleOK: ref(true),
+            bDataTypeOK: ref(true),
+            bDataDateOfficielleOK: ref(false), //champ html date, pas de rules
+            bDataAuteurOK: ref(false), //règles combinée, interne (employé), externe (acteur), inconnu
         },
         messagesErreur: {
             bSnackbar: ref(false),
             timeOutSnackbar: ref(10000),
             messageSnackbar: ref(''),
-            dateDebut: ref(''),
-            dateFin: ref(''),
             serverbackend: ref(''),
         }, 
     }),
     getters: {
         bdataOK: (state)  => {
             if (state.controle.bDataFileOK 
-                //&& state.controle.bdataGenDateDebutOK
-                //&& state.controle.bdataGenDateFinOK
-            ) {
+                && state.controle.bDataTitreOK
+                && state.controle.bDataFamilleOK
+                && state.controle.bDataTypeOK
+                && state.controle.bDataDateOfficielleOK
+           ) {
                 return true
             } else {
                 return false
