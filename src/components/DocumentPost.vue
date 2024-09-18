@@ -2,7 +2,13 @@
 .go-erreur {
     font-size: small;
     color: rgb(177, 14, 14);
-    vertical-align: bottom;
+    vertical-align: bottom;    
+}
+.floating-btn {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  z-index: 100;
 }
 </style>
 
@@ -24,7 +30,6 @@
     </template>
   </v-snackbar>
 
-  <AppToper />
   <v-container>
     <v-row dense>
       <v-col>
@@ -200,6 +205,18 @@
         </v-col>
     </v-row>
   </v-container>
+  <v-btn
+    v-if="lesDatas.file !== null && lesDatas.bdataOK"
+    class="floating-btn"
+    color="primary"
+    fab
+    fixed
+    bottom
+    right
+    @click="demandeSauveData()"
+  >
+    Sauver
+  </v-btn>  
   <AppFooter/>
   </template>
   
@@ -242,7 +259,7 @@ const bChoixEmploye = ref(false)
 const txtEmployeAuteur = ref('')
 const bChoixActeur = ref(false)
 
-const messagesErreurDateOfficielle = ref('')
+const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou signalée inconnue')
 
 const titreRules = [
     value => {
@@ -394,6 +411,7 @@ watch(() => bDateOfficielleInconnue.value, () => {
     if (bDateOfficielleInconnue.value) {
         lesDatas.document.dateOfficielle = ''
         lesDatas.controle.bDataDateOfficielleOK = true
+        messagesErreurDateOfficielle.value = '' 
     } else if (lesDatas.document.dateOfficielle === '') {
         lesDatas.controle.bDataDateOfficielleOK = false
         messagesErreurDateOfficielle.value = 'la date officielle est obligatoire ou signalée inconnue'         

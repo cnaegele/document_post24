@@ -13,18 +13,6 @@
     >
         <v-toolbar-title>Document indexation</v-toolbar-title>
     
-
-        <v-tooltip text="indexer le document" v-if="lesDatas.file !== null && lesDatas.bdataOK">
-            <template v-slot:activator="{ props }">
-                <v-btn
-                    v-bind="props"
-                    icon="mdi-database-arrow-left-outline"
-                    @click="demandeSauveData()"
-                />
-            </template>        
-        </v-tooltip>
-
-    
         <v-spacer></v-spacer>
         <div style="position: absolute; right: 16px;">
             <Suspense><UserInformation></UserInformation></Suspense>

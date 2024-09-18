@@ -58,6 +58,7 @@ export const data = defineStore({
                 && state.controle.bDataFamilleOK
                 && state.controle.bDataTypeOK
                 && state.controle.bDataDateOfficielleOK
+                && state.controle.bDataAuteurOK
            ) {
                 return true
             } else {
