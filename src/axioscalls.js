@@ -33,11 +33,13 @@ export async function uploadFile(formData) {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        console.log('Fichier téléchargé avec succès:', response.data)
         // Ajoutez ici le code pour gérer la réponse du serveur
+        //console.log('dans uploadFile Fichier téléchargé avec succès:', response.data)
+        return(response.data)
     } catch (error) {
         console.error('Erreur lors du téléchargement du fichier:', error)
         // Ajoutez ici le code pour gérer les erreurs
+        return('')
     }        
 }
 

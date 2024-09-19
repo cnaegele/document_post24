@@ -62,5 +62,5 @@ export const documentPostProps = {
       default() {
         return 10000000
       }
-    }
+    },
   }

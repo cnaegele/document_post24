@@ -4,8 +4,8 @@ export const data = defineStore({
     id: 'iddata',
     state: () => ({
         env: {
-            version: ref('0.0.0'),
-            dateversion: ref('03.09.2024'),
+            version: ref('0.1.0'),
+            dateversion: ref('19.09.2024'),
             themeChoisi: ref(localStorage.getItem('themeChoisi') || 'dark'),
         },
         user: {
@@ -59,7 +59,7 @@ export const data = defineStore({
                 && state.controle.bDataTypeOK
                 && state.controle.bDataDateOfficielleOK
                 && state.controle.bDataAuteurOK
-           ) {
+            ) {
                 return true
             } else {
                 return false

@@ -128,12 +128,12 @@
         <v-col cols="12" md="2" class="titreChampSaisie">
             <span>Auteur&nbsp;&nbsp;</span>
             <span v-if="lesDatas.document.documentIntExt == 'docInterne' && !bAuteurInconnu">
-                <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixEmploye=!bChoixEmploye">Choix employé</v-btn>
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="choixEmploye()">Choix employé</v-btn>
                 <br>    
-                <v-btn size="x-small" rounded="xl" class="text-none" @click="auteurUser">moi</v-btn>
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="auteurUser()">moi</v-btn>
             </span>
             <span v-if="lesDatas.document.documentIntExt == 'docExterne' && !bAuteurInconnu">
-                <v-btn size="x-small" rounded="xl" class="text-none" @click="bChoixActeur=!bChoixActeur">Choix acteur(s)</v-btn>
+                <v-btn size="x-small" rounded="xl" class="text-none" @click="choixActeur()">Choix acteur(s)</v-btn>
             </span>
        </v-col>
         <v-col cols="12" md="10">
@@ -166,24 +166,6 @@
                     </v-row>    
                 </v-container>
             </div>
-            <div v-if="bChoixEmploye">
-                <Suspense>
-                    <EmployeChoix 
-                        uniteHorsVdL="non" 
-                        :modeChoix="'unique'"
-                        @choixEmploye="receptionEmployeAuteur"
-                    />
-                </Suspense>
-            </div>
-            <div v-if="bChoixActeur">
-                <ActeurChoix 
-                    critereTypeInit="nom"
-                    nombreMaximumRetour="50"
-                    :modeChoix="'unique'"
-                    @choixActeur="receptionActeurAuteur"
-                    >
-                    </ActeurChoix>
-            </div>
             <div>
                 <v-checkbox 
                     label="inconnu"
@@ -205,6 +187,7 @@
         </v-col>
     </v-row>
   </v-container>
+  
   <v-btn
     v-if="lesDatas.file !== null && lesDatas.bdataOK"
     class="floating-btn"
@@ -213,10 +196,84 @@
     fixed
     bottom
     right
-    @click="demandeSauveData()"
+    @click="sauveData()"
   >
     Sauver
-  </v-btn>  
+  </v-btn> 
+
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
+          id="btnActiveCardChoixEmploye"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+          <span class="cardTitre"><h3>Choix d'un employé</h3> (cliquez sur le nom pour sélectionner)</span>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardEmployeChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <Suspense>
+                    <EmployeChoix 
+                        uniteHorsVdL="non" 
+                        :modeChoix="'unique'"
+                        @choixEmploye="receptionEmployeAuteur"
+                    />
+                </Suspense>
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
+          id="btnActiveCardChoixActeur"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+          <span class="cardTitre"><h3>Choix d'un acteur</h3> (cliquez sur le nom pour sélectionner)</span>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardActeurChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <Suspense>
+                    <ActeurChoix 
+                        critereTypeInit="nom"
+                        nombreMaximumRetour="50"
+                        :modeChoix="'unique'"
+                        @choixActeur="receptionActeurAuteur"
+                    />
+               </Suspense>
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
   <AppFooter/>
   </template>
   
@@ -225,10 +282,14 @@ import { ref, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
-import { verifieNouveauMD5 } from '@/sauve.js'
+import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 
+const emit = defineEmits(['postDocument'])
+const postDocument = (jsonDocument) => {
+    emit('postDocument', jsonDocument)
+}
 const lesDatas = data()
 const props = defineProps(documentPostProps)
 const { famillestypes } = toRefs(props)
@@ -255,9 +316,7 @@ const itemsNivConf = await getDicoNiveauConfidentialite()
 
 const bDateOfficielleInconnue = ref(false)
 const bAuteurInconnu = ref(false)
-const bChoixEmploye = ref(false)
 const txtEmployeAuteur = ref('')
-const bChoixActeur = ref(false)
 
 const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou signalée inconnue')
 
@@ -455,24 +514,27 @@ watch(() => lesDatas.document.acteurAuteur, () => {
 }, { deep: true })
 
 const auteurUser = () => {
-    const oEmployeUser = {
-        idemploye: lesDatas.user.idEmployeUser,
-        nom: lesDatas.user.nomEmployeUser,
-        prenom: lesDatas.user.prenomEmployeUser,
-        unite: '',
-    }
-    receptionEmployeAuteur(lesDatas.user.idEmployeUser, JSON.stringify(oEmployeUser))
+    lesDatas.document.idEmployeAuteur = lesDatas.user.idEmployeUser
+    txtEmployeAuteur.value = `${lesDatas.user.nomEmployeUser} ${lesDatas.user.prenomEmployeUser}`
+}
+const choixEmploye = () => {
+    document.getElementById("btnActiveCardChoixEmploye").click() 
 }
 const receptionEmployeAuteur = (idemploye, jsonData) => {
-    bChoixEmploye.value = false
     //console.log(jsonData)
     const oEmployeAuteur = JSON.parse(jsonData)
     lesDatas.document.idEmployeAuteur = oEmployeAuteur.idemploye
     txtEmployeAuteur.value = `${oEmployeAuteur.nom} ${oEmployeAuteur.prenom}. ${oEmployeAuteur.unite}`
+    closeCardEmployeChoix()
+}
+const closeCardEmployeChoix = () => {
+  document.getElementById("btnActiveCardChoixEmploye").click()    
 }
 
+const choixActeur = () => {
+    document.getElementById("btnActiveCardChoixActeur").click() 
+}
 const receptionActeurAuteur = (idacteur, jsonData) => {
-    bChoixActeur.value = false
     console.log(jsonData)
     const oActeurAuteur = JSON.parse(jsonData)
     if (lesDatas.document.acteurAuteur.length > 0) {
@@ -487,6 +549,10 @@ const receptionActeurAuteur = (idacteur, jsonData) => {
         nom: oActeurAuteur.acteurnom,
     }
     lesDatas.document.acteurAuteur.push(acteurA)
+    closeCardActeurChoix()
+}
+const closeCardActeurChoix = () => {
+  document.getElementById("btnActiveCardChoixActeur").click()    
 }
 
 const supprimeActeurAuteur = (idacteur) => {
@@ -500,5 +566,11 @@ const supprimeActeurAuteur = (idacteur) => {
             }
         }       
     }
+}
+
+const sauveData = async () => {
+    const reponseData = await demandeSauveData()
+    const jsonData = JSON.stringify(reponseData)
+    emit('postDocument', jsonData)
 }
 </script>

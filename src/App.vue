@@ -6,7 +6,8 @@
         <DocumentPost
           :sizemax="5000000"
           titre=""
-          sujet="" 
+          sujet=""
+          @postDocument="receptionDocumentPost"
         ></DocumentPost>
     </Suspense>
     </v-main>
@@ -14,4 +15,10 @@
 </template>
 
 <script setup>
+const receptionDocumentPost = (jsonData) => {
+  console.log(`receptionDocumentPost suite emit ${jsonData}`)
+  const oDocument = JSON.parse(jsonData)
+  const idDocument = oDocument.iddocument
+  document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument 
+}
 </script>

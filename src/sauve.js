@@ -69,7 +69,8 @@ export const demandeSauveData = async () => {
     // Ajout des métadonnées JSON au FormData
     formData.append('metadata', JSON.stringify(metadata))
     
-    uploadFile(formData)
+    const reponseData = await uploadFile(formData)
+    return(reponseData)
 }
 
 async function readFileAsArrayBuffer(file) {
