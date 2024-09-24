@@ -1,7 +1,6 @@
 
 export const documentPostPropsIni = async (codeconfig = '') => {
-  if (codeconfig == '') {
-    return {
+  const defaultConfig = {
     famillestypes: [
             {
             id: 7,
@@ -45,8 +44,14 @@ export const documentPostPropsIni = async (codeconfig = '') => {
         ],
     
     titre: 'titre de la configuration initiale',
-    xsujet: 'sujet de la configuration initiale',
+    sujet: 'sujet de la configuration initiale',
     sizemax: 10000000,
-      }
-    }
   }
+
+  if (codeconfig == '') {
+    return defaultConfig
+  } else {
+    //Ici il faudra faire l'appel axios qui va lire le fichier de config correspondant au paramètre codeconfig
+    return defaultConfig  
+  }
+}

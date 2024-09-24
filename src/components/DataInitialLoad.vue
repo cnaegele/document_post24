@@ -14,10 +14,10 @@ import { dataini } from '@/stores/dataini.js'
 const lesDatasIni = dataini()
 const propsIni =  await documentPostPropsIni('')
 
-    if (propsIni.titre !== undefined) {
+    if (propsIni.hasOwnProperty("titre")) {
         lesDatasIni.titre = propsIni.titre
     }
-    if (propsIni.sujet !== undefined) {
+    if (propsIni.hasOwnProperty("sujet")) {
         lesDatasIni.sujet = propsIni.sujet
     }
 
