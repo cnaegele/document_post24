@@ -1,24 +1,36 @@
+
 <template>
+  <Suspense>
   <v-app>
     <v-main>
       <AppToper />
-      <Suspense>
-        <DocumentPost
-          :sizemax="5000000"
-          titre=""
-          sujet=""
-          @postDocument="receptionDocumentPost"
-        ></DocumentPost>
-    </Suspense>
+      <DataInitialLoad />
+    
     </v-main>
   </v-app>
+ </Suspense>
 </template>
 
+
 <script setup>
-const receptionDocumentPost = (jsonData) => {
-  console.log(`receptionDocumentPost suite emit ${jsonData}`)
-  const oDocument = JSON.parse(jsonData)
-  const idDocument = oDocument.iddocument
-  document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument 
+import { ref, reactive, onMounted } from 'vue';
+import axios from 'axios'
+import { dataini } from '@/stores/dataini.js'
+import DataInitialLoad from './components/DataInitialLoad.vue';
+
+const lesDatasIni = dataini()
+console.log(lesDatasIni.titre)
+
+//Définition des propriété du composant
+
+//onMounted(dataLoaded.value = true)
+
+
+const urlParams = new URLSearchParams(window.location.search)
+let configurationInitialData = ''
+if (urlParams.has('configini')) {
+  configurationInitialData = ref(urlParams.get('configini'))
 }
+
+
 </script>

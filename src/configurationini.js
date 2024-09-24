@@ -1,8 +1,8 @@
-export const documentPostProps = {
-    famillestypes: {
-      type: Array,
-      default() {
-        return [
+
+export const documentPostPropsIni = async (codeconfig = '') => {
+  if (codeconfig == '') {
+    return {
+    famillestypes: [
             {
             id: 7,
             label: 'Correspondance',
@@ -42,25 +42,11 @@ export const documentPostProps = {
               },
             ],
           },
-        ]
+        ],
+    
+    titre: 'titre de la configuration initiale',
+    xsujet: 'sujet de la configuration initiale',
+    sizemax: 10000000,
       }
-    },
-    titre: {
-      type: String,
-      default() {
-        return ''
-      } 
-    },
-    sujet: {
-      type: String,
-      default() {
-        return ''
-      } 
-    },
-    sizemax: {
-      type: Number,
-      default() {
-        return 10000000
-      }
-    },
+    }
   }
