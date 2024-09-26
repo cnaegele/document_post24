@@ -5,7 +5,7 @@
     <v-main>
       <AppToper />
       <DataInitialLoad :codeConfigIni="configurationInitialData"/>
-    
+      <AppFooter/>
     </v-main>
   </v-app>
  </Suspense>

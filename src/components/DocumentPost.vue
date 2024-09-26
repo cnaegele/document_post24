@@ -277,7 +277,6 @@
     </template>
   </v-dialog>
 
-  <AppFooter/>
   </template>
   
  <script setup>
