@@ -6,6 +6,16 @@ if (import.meta.env.DEV) {
 }
 const g_pathurl = '/goeland/document/axios/'
 
+export async function getConfigurationInitiale(codeConfig) {
+    const urlcoi = `${g_devurl}${g_pathurl}document_nouveau_configuration.php`
+    const params = new URLSearchParams([['codeconfig', codeConfig]])
+    const response = await axios.get(urlcoi, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
 export async function getDicoNiveauConfidentialite() {
     const urldnc = `${g_devurl}${g_pathurl}document_niveauconfidentialite_dico.php`
     const response = await axios.get(urldnc)

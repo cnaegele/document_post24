@@ -4,7 +4,7 @@
   <v-app>
     <v-main>
       <AppToper />
-      <DataInitialLoad />
+      <DataInitialLoad :codeConfigIni="configurationInitialData"/>
     
     </v-main>
   </v-app>
@@ -13,18 +13,8 @@
 
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import axios from 'axios'
-import { dataini } from '@/stores/dataini.js'
+import { ref } from 'vue';
 import DataInitialLoad from './components/DataInitialLoad.vue';
-
-const lesDatasIni = dataini()
-console.log(lesDatasIni.titre)
-
-//Définition des propriété du composant
-
-//onMounted(dataLoaded.value = true)
-
 
 const urlParams = new URLSearchParams(window.location.search)
 let configurationInitialData = ''

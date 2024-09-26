@@ -1,75 +1,60 @@
 <template>
     <DocumentPost
-        :sizemax="5000000"
+        :sizemax="lesDatasIni.sizemax"
         :titre="lesDatasIni.titre"
         :sujet="lesDatasIni.sujet"
         :famillestypes="lesDatasIni.famillestypes"
         @postDocument="receptionDocumentPost"
     ></DocumentPost>
 </template>
+
 <script setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, toRefs } from 'vue'
 import { documentPostPropsIni } from '../configurationini.js'
-import { dataini } from '@/stores/dataini.js'
-const lesDatasIni = dataini()
-const propsIni =  await documentPostPropsIni('')
-
-    if (propsIni.hasOwnProperty("titre")) {
-        lesDatasIni.titre = propsIni.titre
+const props = defineProps({
+  codeConfigIni: {
+      type: String,
+      default() {
+        return ''
+      } 
     }
-    if (propsIni.hasOwnProperty("sujet")) {
-        lesDatasIni.sujet = propsIni.sujet
-    }
+})
+const { codeConfigIni } = toRefs(props)
+console.log(codeConfigIni.value)
 
-    lesDatasIni.famillestypes = ref(
-  [
-            {
-            id: 7,
-            label: 'Correspondance du ventre',
-            value: '7',
-            type: [
-            {
-                  id: 15,
-                  label: 'pdf',
-                  value: '15',
-              },
-              {
-                  id: 18,
-                  label: 'txt',
-                  value: '18',
-              },
-            ],
-          },
-          {
-            id: 5,
-            label: 'Photo',
-            value: '5',
-            type: [
-            {
-                  id: 15,
-                  label: 'pdf',
-                  value: '15',
-              },
-              {
-                  id: 5,
-                  label: 'jpg',
-                  value: '5',
-              },
-              {
-                  id: 20,
-                  label: 'png',
-                  value: '20',
-              },
-            ],
-          },
-        ]
+const lesDatasIni = ref(
+  {
+        famillestypes: [],
+        titre:  '',
+        sujet:  '',
+        sizemax: 10000000,
+  }
 )
-//Fin proprietés
+
+const propsIni =  await documentPostPropsIni(codeConfigIni.value)
+//console.log(`propsini: ${propsIni}`)
+if (propsIni.hasOwnProperty("famillestypes")) {
+    lesDatasIni.value.famillestypes = propsIni.famillestypes
+}
+if (propsIni.hasOwnProperty("titre")) {
+    lesDatasIni.value.titre = propsIni.titre
+}
+if (propsIni.hasOwnProperty("sujet")) {
+    lesDatasIni.value.sujet = propsIni.sujet
+}
+if (propsIni.hasOwnProperty("sizemax")) {
+    lesDatasIni.value.sizemax = propsIni.sizemax
+}
 
 const receptionDocumentPost = (jsonData) => {
   console.log(`receptionDocumentPost suite emit ${jsonData}`)
   const oDocument = JSON.parse(jsonData)
-  const idDocument = oDocument.iddocument
-  document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument 
+  const succes = oDocument.succes
+  if (succes) {
+    const idDocument = oDocument.iddocument
+    document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
+  } else {
+    alert(oDocument.message)  
+  }
 }
 </script>

@@ -1,57 +1,17 @@
+import { getConfigurationInitiale } from './axioscalls.js'
+import { documentPostPropsDefault } from './components/DocumentPostProps.js'
 
+//On va chercher une configuration initiale par défaut dans le javascript qui défini aussi 
+//les propriétés par défaut du composant DocumentPost
 export const documentPostPropsIni = async (codeconfig = '') => {
-  const defaultConfig = {
-    famillestypes: [
-            {
-            id: 7,
-            label: 'Correspondance',
-            value: '7',
-            type: [
-              {
-                  id: 15,
-                  label: 'pdf',
-                  value: '15',
-              },
-              {
-                  id: 18,
-                  label: 'txt',
-                  value: '18',
-              },
-            ],
-          },
-          {
-            id: 5,
-            label: 'Photo',
-            value: '5',
-            type: [
-              {
-                  id: 15,
-                  label: 'pdf',
-                  value: '15',
-              },
-              {
-                  id: 5,
-                  label: 'jpg',
-                  value: '5',
-              },
-              {
-                  id: 20,
-                  label: 'png',
-                  value: '20',
-              },
-            ],
-          },
-        ],
-    
-    titre: 'titre de la configuration initiale',
-    sujet: 'sujet de la configuration initiale',
-    sizemax: 10000000,
-  }
-
   if (codeconfig == '') {
-    return defaultConfig
+    return documentPostPropsDefault
   } else {
-    //Ici il faudra faire l'appel axios qui va lire le fichier de config correspondant au paramètre codeconfig
-    return defaultConfig  
+    const configInitiale = await getConfigurationInitiale(codeconfig)
+    if (JSON.stringify(configInitiale) != '{}') {
+      return configInitiale
+    } else {
+      return documentPostPropsDefault  
+    }
   }
 }
