@@ -31,6 +31,9 @@
   </v-snackbar>
 
   <v-container>
+    <v-row dense v-if="libelle != ''">
+        <v-col>{{ libelle }}</v-col>
+    </v-row>
     <v-row dense>
       <v-col>
         <v-file-input
@@ -292,13 +295,17 @@ const postDocument = (jsonDocument) => {
 }
 const lesDatas = data()
 const props = defineProps(documentPostProps)
-const { famillestypes } = toRefs(props)
-const { sizemax } = toRefs(props)
-lesDatas.document.sizemax = sizemax
+const { libelle } = toRefs(props)
 const { titre } = toRefs(props)
 lesDatas.document.titre = titre.value
+const { famillestypes } = toRefs(props)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = sujet.value
+const { idniveauconfidentialite } = toRefs(props)
+lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
+const { sizemax } = toRefs(props)
+lesDatas.document.sizemax = sizemax
+
 
 const itemsFamille = ref([])
 const itemsType = ref([])

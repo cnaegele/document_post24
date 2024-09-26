@@ -1,5 +1,17 @@
 export const documentPostProps = {
-    famillestypes: {
+  libelle: {
+    type: String,
+    default() {
+      return ''
+    }     
+  },
+  titre: {
+    type: String,
+    default() {
+      return ''
+    } 
+  },
+  famillestypes: {
       type: Array,
       default() {
         return [
@@ -45,17 +57,17 @@ export const documentPostProps = {
         ]
       }
     },
-    titre: {
-      type: String,
-      default() {
-        return ''
-      } 
-    },
     sujet: {
       type: String,
       default() {
         return ''
       } 
+    },
+    idniveauconfidentialite: {
+      type: String,
+      default() {
+        return '1'
+      }
     },
     sizemax: {
       type: Number,
@@ -66,7 +78,9 @@ export const documentPostProps = {
   }
 
   export const documentPostPropsDefault = {
-      famillestypes: [
+    libelle: '',
+    titre: '',
+    famillestypes: [
               {
               id: 7,
               label: 'Correspondance',
@@ -108,7 +122,6 @@ export const documentPostProps = {
             },
           ],
       
-      titre: 'titre de la configuration initiale',
-      sujet: 'sujet de la configuration initiale',
+      sujet: '',
       sizemax: 10000000,  
   }

@@ -1,9 +1,11 @@
 <template>
     <DocumentPost
-        :sizemax="lesDatasIni.sizemax"
+        :libelle="lesDatasIni.libelle"
         :titre="lesDatasIni.titre"
-        :sujet="lesDatasIni.sujet"
         :famillestypes="lesDatasIni.famillestypes"
+        :sujet="lesDatasIni.sujet"
+        :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
+        :sizemax="lesDatasIni.sizemax"
         @postDocument="receptionDocumentPost"
     ></DocumentPost>
 </template>
@@ -20,27 +22,36 @@ const props = defineProps({
     }
 })
 const { codeConfigIni } = toRefs(props)
-console.log(codeConfigIni.value)
+//console.log(codeConfigIni.value)
 
 const lesDatasIni = ref(
   {
-        famillestypes: [],
-        titre:  '',
-        sujet:  '',
-        sizemax: 10000000,
+    libelle: '',
+    titre:  '',
+    famillestypes: [],
+    sujet:  '',
+    idniveauconfidentialite: '1',
+    sizemax: 10000000,
   }
 )
 
 const propsIni =  await documentPostPropsIni(codeConfigIni.value)
-//console.log(`propsini: ${propsIni}`)
-if (propsIni.hasOwnProperty("famillestypes")) {
-    lesDatasIni.value.famillestypes = propsIni.famillestypes
+//console.log(`propsini: ${JSON.stringify(propsIni)}`)
+if (propsIni.hasOwnProperty("libelle")) {
+    lesDatasIni.value.libelle = propsIni.libelle
 }
 if (propsIni.hasOwnProperty("titre")) {
     lesDatasIni.value.titre = propsIni.titre
 }
+if (propsIni.hasOwnProperty("famillestypes")) {
+    lesDatasIni.value.famillestypes = propsIni.famillestypes
+}
+
 if (propsIni.hasOwnProperty("sujet")) {
     lesDatasIni.value.sujet = propsIni.sujet
+}
+if (propsIni.hasOwnProperty("idniveauconfidentialite")) {
+    lesDatasIni.value.idniveauconfidentialite = propsIni.idniveauconfidentialite
 }
 if (propsIni.hasOwnProperty("sizemax")) {
     lesDatasIni.value.sizemax = propsIni.sizemax
