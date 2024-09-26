@@ -1,4 +1,20 @@
 <template>
+  <v-snackbar
+    color="#FFCDD2"
+    multi-line
+    location="center"
+    v-model="bSnackbar"
+    :timeout="-1"
+  >
+    <div v-html="message"></div>
+    <template v-slot:actions>
+      <v-btn
+        text="Fermer"
+        variant="tonal"
+        @click="bSnackbar = false"
+      ></v-btn>
+    </template>
+  </v-snackbar>
     <DocumentPost
         :libelle="lesDatasIni.libelle"
         :titre="lesDatasIni.titre"
@@ -35,6 +51,8 @@ const lesDatasIni = ref(
   }
 )
 
+const bSnackbar = ref(false)
+const message = ref('')
 const propsIni =  await documentPostPropsIni(codeConfigIni.value)
 //console.log(`propsini: ${JSON.stringify(propsIni)}`)
 if (propsIni.hasOwnProperty("libelle")) {
@@ -60,12 +78,13 @@ if (propsIni.hasOwnProperty("sizemax")) {
 const receptionDocumentPost = (jsonData) => {
   console.log(`receptionDocumentPost suite emit ${jsonData}`)
   const oDocument = JSON.parse(jsonData)
-  const succes = oDocument.succes
-  if (succes) {
+  const success = oDocument.success
+  if (success) {
     const idDocument = oDocument.iddocument
     document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
   } else {
-    alert(oDocument.message)  
+    bSnackbar.value = true
+    message.value = oDocument.message 
   }
 }
 </script>
