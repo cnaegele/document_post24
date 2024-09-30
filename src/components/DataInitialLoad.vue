@@ -81,7 +81,7 @@ const receptionDocumentPost = (jsonData) => {
   const success = oDocument.success
   if (success) {
     const idDocument = oDocument.iddocument
-    document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
+    //document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
   } else {
     bSnackbar.value = true
     message.value = oDocument.message 

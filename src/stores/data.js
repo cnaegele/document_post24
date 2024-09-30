@@ -34,6 +34,12 @@ export const data = defineStore({
                 id: ref(0),
                 nom: ref('')
             */
+            objetslies: ref([]),
+            /*
+                id: ref(0),
+                type: ref(''),
+                nom: ref('')
+            */
             idNiveauConfidentialite: ref('1')
        },
         controle: {

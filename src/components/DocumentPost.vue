@@ -178,6 +178,62 @@
         </v-col>
     </v-row>
     <v-row dense>
+        <v-col>
+            <v-expansion-panels v-model="panelObjetsLies">
+            <v-expansion-panel>
+                <v-expansion-panel-title>
+                    <span  class="d-flex">
+                    <span class="titreChampSaisie">Objets liés&nbsp;&nbsp;</span>
+                        <v-tooltip text="ajouter un objet lié">
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    rounded="lg"
+                                    @click.stop="ajoutObjetLie()"
+                                >+</v-btn>
+                            </template>        
+                        </v-tooltip>
+                        &nbsp;&nbsp;
+                        <v-text-field
+                            dense
+                            v-model="idObjetLieAjout"
+                            ref="inpIdObjetLieAjout"
+                            label="id objet"
+                            :rules="objetLieAjoutRule"
+                            style="width: 200px;"
+                            @click.stop
+                        ></v-text-field> 
+                    </span>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>  
+                    <v-container>
+                        <v-row dense v-for="(objetlie, index) in lesDatas.document.objetslies" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le lien objet">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeLienObjet(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                            {{ objetlie.type }}
+                            </v-col>
+                            <v-col cols="12" md="8">
+                                {{ objetlie.nom }}
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+            </v-expansion-panels>    
+        </v-col>
+    </v-row>
+    <v-row dense>
       <v-col cols="12" md="2" class="titreChampSaisie">Niveau de confidentialité</v-col>
         <v-col cols="12" md="5">
             <v-select
@@ -285,6 +341,7 @@ import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
 import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
+import { objetInfoParId } from '..//axioscalls.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 
@@ -305,7 +362,6 @@ lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
 
-
 const itemsFamille = ref([])
 const itemsType = ref([])
 let itemF
@@ -325,6 +381,10 @@ const bAuteurInconnu = ref(false)
 const txtEmployeAuteur = ref('')
 
 const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou signalée inconnue')
+
+const panelObjetsLies = ref([])
+const idObjetLieAjout = ref('')
+const inpIdObjetLieAjout = ref(null)
 
 const titreRules = [
     value => {
@@ -354,6 +414,23 @@ const typeRules = [
             return true
         }
         return 'choisir un type' 
+    }
+]
+
+const objetLieAjoutRule = [
+    value => {
+        if (value === '') {
+            return true
+        }
+        if (/^\+?(0|[1-9]\d*)$/.test(value)) {
+            if (value > 0 && value <= 999999999) {
+                return true
+            } else {
+                return "l'id objet est invalide > 999999999"
+            }
+        } else {
+            return "l'id objet est invalide."
+        }
     }
 ]
 
@@ -541,7 +618,7 @@ const choixActeur = () => {
     document.getElementById("btnActiveCardChoixActeur").click() 
 }
 const receptionActeurAuteur = (idacteur, jsonData) => {
-    console.log(jsonData)
+    //console.log(jsonData)
     const oActeurAuteur = JSON.parse(jsonData)
     if (lesDatas.document.acteurAuteur.length > 0) {
         for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
@@ -572,6 +649,47 @@ const supprimeActeurAuteur = (idacteur) => {
             }
         }       
     }
+}
+
+const ajoutObjetLie = async () => {
+    const idObjet = idObjetLieAjout.value.trim()
+    if (idObjet === "") {
+        inpIdObjetLieAjout.value.$el.querySelector('input').focus()    
+    } else {
+        if (/^\+?(0|[1-9]\d*)$/.test(idObjet)) {
+            if (idObjet > 0 && idObjet <= 999999999) {
+                //On regarde si cet objet est déjà dans les objets liés
+                panelObjetsLies.value = [0]
+                let bTrouve = false
+                for (let i=0; i<lesDatas.document.objetslies.length; i++) {
+                    if (lesDatas.document.objetslies[i].id == idObjet) {
+                        bTrouve = true
+                        break
+                    }
+                }
+                if (!bTrouve) {
+                    const objetInfo = await objetInfoParId(idObjet)
+                    if (objetInfo.length == 1) {
+                        const oObjetLiePlus = {
+                            "id": objetInfo[0].id,
+                            "type": objetInfo[0].type,
+                            "nom": objetInfo[0].nom,
+                        }
+                        lesDatas.document.objetslies.push(oObjetLiePlus)
+                        idObjetLieAjout.value = ''
+                    } else {
+                        lesDatas.messagesErreur.timeOutSnackbar = 10000
+                        lesDatas.messagesErreur.bSnackbar = true
+                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjet} n'existe pas`
+                    }
+                }    
+            }
+        }        
+    }
+}
+
+const supprimeLienObjet = (index) => {
+    lesDatas.document.objetslies.splice(index, 1)
 }
 
 const sauveData = async () => {

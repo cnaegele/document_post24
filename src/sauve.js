@@ -47,8 +47,15 @@ export const demandeSauveData = async () => {
 
     const aIdActeurAuteur = []
     if (lesDatas.document.acteurAuteur.length > 0) {
-        for (let i=0; i<esDatas.document.acteurAuteur.length; i++) {
-            aIdActeurAuteur.push(lesDatas.document.acteurAuteur.id)   
+        for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
+            aIdActeurAuteur.push(lesDatas.document.acteurAuteur[i].id)   
+        }
+    }
+
+    const aIdObjetsLies = []
+    if (lesDatas.document.objetslies.length > 0) {
+        for (let i=0; i<lesDatas.document.objetslies.length; i++) {
+            aIdObjetsLies.push(lesDatas.document.objetslies[i].id)   
         }
     }
     // Création de l'objet JSON avec les données attributaires
@@ -64,11 +71,13 @@ export const demandeSauveData = async () => {
         idemployeauteur: lesDatas.document.idEmployeAuteur,
         idniveauconfidentialite: lesDatas.document.idNiveauConfidentialite,
         idacteurauteur: aIdActeurAuteur,
+        idobjetslies: aIdObjetsLies,
     }
 
     // Ajout des métadonnées JSON au FormData
-    formData.append('metadata', JSON.stringify(metadata))
-    
+    console.log(metadata)
+     formData.append('metadata', JSON.stringify(metadata))
+   
     const reponseData = await uploadFile(formData)
     return(reponseData)
 }
