@@ -336,7 +336,7 @@
   </template>
   
  <script setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, onMounted, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
@@ -357,10 +357,14 @@ lesDatas.document.titre = titre.value
 const { famillestypes } = toRefs(props)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = sujet.value
+//objetslies, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
+const { objetslies } = toRefs(props)
 const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
+
+console.log(objetslies.value)
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -651,24 +655,26 @@ const supprimeActeurAuteur = (idacteur) => {
     }
 }
 
-const ajoutObjetLie = async () => {
-    const idObjet = idObjetLieAjout.value.trim()
-    if (idObjet === "") {
+const ajoutObjetLie = async (idObjetPrm) => {
+    if (idObjetPrm == undefined) {
+        idObjetPrm = idObjetLieAjout.value.trim()
+    }
+    if (idObjetPrm === "") {
         inpIdObjetLieAjout.value.$el.querySelector('input').focus()    
     } else {
-        if (/^\+?(0|[1-9]\d*)$/.test(idObjet)) {
-            if (idObjet > 0 && idObjet <= 999999999) {
+        if (/^\+?(0|[1-9]\d*)$/.test(idObjetPrm)) {
+            if (idObjetPrm > 0 && idObjetPrm <= 999999999) {
                 //On regarde si cet objet est déjà dans les objets liés
                 panelObjetsLies.value = [0]
                 let bTrouve = false
                 for (let i=0; i<lesDatas.document.objetslies.length; i++) {
-                    if (lesDatas.document.objetslies[i].id == idObjet) {
+                    if (lesDatas.document.objetslies[i].id == idObjetPrm) {
                         bTrouve = true
                         break
                     }
                 }
                 if (!bTrouve) {
-                    const objetInfo = await objetInfoParId(idObjet)
+                    const objetInfo = await objetInfoParId(idObjetPrm)
                     if (objetInfo.length == 1) {
                         const oObjetLiePlus = {
                             "id": objetInfo[0].id,
@@ -680,7 +686,7 @@ const ajoutObjetLie = async () => {
                     } else {
                         lesDatas.messagesErreur.timeOutSnackbar = 10000
                         lesDatas.messagesErreur.bSnackbar = true
-                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjet} n'existe pas`
+                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjetPrm} n'existe pas`
                     }
                 }    
             }
@@ -697,4 +703,13 @@ const sauveData = async () => {
     const jsonData = JSON.stringify(reponseData)
     emit('postDocument', jsonData)
 }
+
+onMounted(async () => {
+    //ajout des objets liés passés en paramètre
+    if (objetslies.value.length > 0) {
+        for (let i=0; i<objetslies.value.length; i++) {
+            ajoutObjetLie(objetslies.value[i].id)    
+        }
+    } 
+})
 </script>

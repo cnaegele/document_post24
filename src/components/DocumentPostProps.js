@@ -63,6 +63,12 @@ export const documentPostProps = {
         return ''
       } 
     },
+    objetslies: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
     idniveauconfidentialite: {
       type: String,
       default() {
