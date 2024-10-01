@@ -104,16 +104,16 @@ if (configIni !== null) {
 }
 //console.log(lesDatasIni.value)
 
-const receptionDocumentPost = (jsonData) => {
-  console.log(`receptionDocumentPost suite emit ${jsonData}`)
-  const oDocument = JSON.parse(jsonData)
-  const success = oDocument.success
+const receptionDocumentPost = (responseData) => {
+  console.log(`receptionDocumentPost suite emit ${responseData}`)
+  //const oDocument = JSON.parse(jsonData)
+  const success = responseData.success
   if (success) {
-    const idDocument = oDocument.iddocument
+    const idDocument = responseData.iddocument
     document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
   } else {
     bSnackbar.value = true
-    message.value = oDocument.message 
+    message.value = responseData.message 
   }
 }
 </script>

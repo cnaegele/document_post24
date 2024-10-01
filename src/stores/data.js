@@ -34,7 +34,7 @@ export const data = defineStore({
                 id: ref(0),
                 nom: ref('')
             */
-            objetslies: ref([]),
+            objetsLies: ref([]),
             /*
                 id: ref(0),
                 type: ref(''),

@@ -53,9 +53,9 @@ export const demandeSauveData = async () => {
     }
 
     const aIdObjetsLies = []
-    if (lesDatas.document.objetslies.length > 0) {
-        for (let i=0; i<lesDatas.document.objetslies.length; i++) {
-            aIdObjetsLies.push(lesDatas.document.objetslies[i].id)   
+    if (lesDatas.document.objetsLies.length > 0) {
+        for (let i=0; i<lesDatas.document.objetsLies.length; i++) {
+            aIdObjetsLies.push(lesDatas.document.objetsLies[i].id)   
         }
     }
     // Création de l'objet JSON avec les données attributaires

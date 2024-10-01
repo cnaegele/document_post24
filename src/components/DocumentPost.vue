@@ -207,7 +207,7 @@
                 </v-expansion-panel-title>
                 <v-expansion-panel-text>  
                     <v-container>
-                        <v-row dense v-for="(objetlie, index) in lesDatas.document.objetslies" :key="index" class="d-flex align-center">
+                        <v-row dense v-for="(objetlie, index) in lesDatas.document.objetsLies" :key="index" class="d-flex align-center">
                             <v-col cols="12" md="1">
                                 <v-tooltip text="supprimer le lien objet">
                                     <template v-slot:activator="{ props }">
@@ -363,8 +363,6 @@ const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
-
-console.log(objetslies.value)
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -667,8 +665,8 @@ const ajoutObjetLie = async (idObjetPrm) => {
                 //On regarde si cet objet est déjà dans les objets liés
                 panelObjetsLies.value = [0]
                 let bTrouve = false
-                for (let i=0; i<lesDatas.document.objetslies.length; i++) {
-                    if (lesDatas.document.objetslies[i].id == idObjetPrm) {
+                for (let i=0; i<lesDatas.document.objetsLies.length; i++) {
+                    if (lesDatas.document.objetsLies[i].id == idObjetPrm) {
                         bTrouve = true
                         break
                     }
@@ -681,7 +679,7 @@ const ajoutObjetLie = async (idObjetPrm) => {
                             "type": objetInfo[0].type,
                             "nom": objetInfo[0].nom,
                         }
-                        lesDatas.document.objetslies.push(oObjetLiePlus)
+                        lesDatas.document.objetsLies.push(oObjetLiePlus)
                         idObjetLieAjout.value = ''
                     } else {
                         lesDatas.messagesErreur.timeOutSnackbar = 10000
@@ -695,13 +693,14 @@ const ajoutObjetLie = async (idObjetPrm) => {
 }
 
 const supprimeLienObjet = (index) => {
-    lesDatas.document.objetslies.splice(index, 1)
+    lesDatas.document.objetsLies.splice(index, 1)
 }
 
 const sauveData = async () => {
     const reponseData = await demandeSauveData()
-    const jsonData = JSON.stringify(reponseData)
-    emit('postDocument', jsonData)
+    //const jsonData = JSON.stringify(reponseData)
+    //console.log(jsonData)
+    emit('postDocument', reponseData)
 }
 
 onMounted(async () => {
