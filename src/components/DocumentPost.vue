@@ -62,7 +62,7 @@
                 item-title="label"
                 :reduce="(item) => itemsFamille.value"
                 :rules="familleRules"
-                placeholder="Sélectionner la famille du document"
+                placeholder="Sélection de la famille"
             ></v-select>                     
         </v-col>
         <v-col cols="12" md="1"></v-col>
@@ -74,7 +74,7 @@
                 item-title="label"
                 :reduce="(item) => itemsType.value"
                 :rules="typeRules"
-                placeholder="Sélectionner le type du document"
+                placeholder="Sélection du type"
             ></v-select>                     
         </v-col>
     </v-row>
@@ -363,6 +363,7 @@ const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
+const { suitesauve } = toRefs(props) //init ou keep
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -375,6 +376,21 @@ for (let i=0; i<famillestypes.value.length; i++) {
     }
     itemsFamille.value.push(itemF)
 }
+//Si il y a une seule famille, on la selectionne et on fabrique la liste des types
+if (itemsFamille.value.length == 1) {
+    lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
+    itemsType.value = []
+    let itemT
+    for (let j=0; j<famillestypes.value[0].type.length; j++) {
+        itemT = {
+            id: famillestypes.value[0].type[j].id,
+            label: famillestypes.value[0].type[j].label,
+            value: famillestypes.value[0].type[j].value,
+        }
+        itemsType.value.push(itemT)
+    }
+}
+
 const itemsNivConf = await getDicoNiveauConfidentialite()
 //console.log(itemsNivConf)
 
@@ -523,7 +539,8 @@ watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
 })
 
 watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
-    if (newValueFile !== undefined && lesDatas.document.idFamille !== '') {
+    
+    if (newValueFile !== null && newValueFile !== undefined && lesDatas.document.idFamille !== '') {
         let bTrouve = false
         let fileExtension = ''
         const posi = newValueFile.name.lastIndexOf('.')
@@ -701,6 +718,47 @@ const sauveData = async () => {
     //const jsonData = JSON.stringify(reponseData)
     //console.log(jsonData)
     emit('postDocument', reponseData)
+
+    //réinitialisation des données du composant
+    lesDatas.file = ref(null)    
+    if (suitesauve.value == "init") {
+        lesDatas.document.titre = titre.value
+        lesDatas.document.idFamille = ref(null)
+        //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
+        if (itemsFamille.value.length == 1) {
+            lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
+            itemsType.value = []
+            let itemT
+            for (let j=0; j<famillestypes.value[0].type.length; j++) {
+                itemT = {
+                    id: famillestypes.value[0].type[j].id,
+                    label: famillestypes.value[0].type[j].label,
+                    value: famillestypes.value[0].type[j].value,
+                }
+                itemsType.value.push(itemT)
+            }
+        }
+        lesDatas.document.idType = ref(null)
+        lesDatas.document.sujet = sujet.value
+        lesDatas.document.description = ''
+        lesDatas.document.commentaire = ''
+        lesDatas.document.dateOfficielle = ''
+        bDateOfficielleInconnue.value = false
+        lesDatas.document.idEmployeAuteur = 0
+        txtEmployeAuteur.value = ''
+        lesDatas.document.acteurAuteur = ref([])
+        bAuteurInconnu.value = false
+        lesDatas.document.documentIntExt = 'docInterne'
+        lesDatas.document.objetsLies = ref([])
+        //ajout des objets liés passés en paramètre
+        if (objetslies.value.length > 0) {
+            for (let i=0; i<objetslies.value.length; i++) {
+                ajoutObjetLie(objetslies.value[i].id)    
+            }
+        } 
+        lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
+    }
+
 }
 
 onMounted(async () => {

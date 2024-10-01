@@ -81,6 +81,12 @@ export const documentPostProps = {
         return 10000000
       }
     },
+    suitesauve: {
+      type: String,
+      default() {
+        return 'init'
+      }
+    }
   }
 
   export const documentPostPropsDefault = {

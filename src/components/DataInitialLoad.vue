@@ -23,6 +23,7 @@
         :objetslies="lesDatasIni.objetslies"
         :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
         :sizemax="lesDatasIni.sizemax"
+        suitesauve="keep"
         @postDocument="receptionDocumentPost"
     ></DocumentPost>
 </template>
@@ -105,12 +106,12 @@ if (configIni !== null) {
 //console.log(lesDatasIni.value)
 
 const receptionDocumentPost = (responseData) => {
-  console.log(`receptionDocumentPost suite emit ${responseData}`)
+  console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
   //const oDocument = JSON.parse(jsonData)
   const success = responseData.success
   if (success) {
     const idDocument = responseData.iddocument
-    document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
+    //document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
   } else {
     bSnackbar.value = true
     message.value = responseData.message 
