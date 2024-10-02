@@ -245,6 +245,14 @@
             ></v-select>                     
         </v-col>
     </v-row>
+    <v-row v-if="lesDatas.document.idNiveauConfidentialite != '0' && lesDatas.document.idNiveauConfidentialite != '1'" dense>
+        <v-col cols="12">...droits de consultation...</v-col>
+    </v-row>
+    <v-row dense>
+        <v-col cols="12">
+            <div v-html="messageLog"></div>        
+        </v-col>
+    </v-row>
   </v-container>
   
   <v-btn
@@ -403,6 +411,7 @@ const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou 
 const panelObjetsLies = ref([])
 const idObjetLieAjout = ref('')
 const inpIdObjetLieAjout = ref(null)
+const messageLog = ref('')
 
 const titreRules = [
     value => {
@@ -495,7 +504,7 @@ watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
         }
     }
     
-    if (lesDatas.file !== null) {
+    if (lesDatas.file !== null&& lesDatas.document.idFamille !== null && lesDatas.document.idFamille !== '') {
         let bTrouve = false
         let fileExtension = ''
         const posi = lesDatas.file.name.lastIndexOf('.')
@@ -540,7 +549,7 @@ watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
 
 watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
     
-    if (newValueFile !== null && newValueFile !== undefined && lesDatas.document.idFamille !== '') {
+    if (newValueFile !== null && newValueFile !== undefined && lesDatas.document.idFamille !== null && lesDatas.document.idFamille !== '') {
         let bTrouve = false
         let fileExtension = ''
         const posi = newValueFile.name.lastIndexOf('.')
@@ -715,50 +724,69 @@ const supprimeLienObjet = (index) => {
 
 const sauveData = async () => {
     const reponseData = await demandeSauveData()
-    //const jsonData = JSON.stringify(reponseData)
-    //console.log(jsonData)
-    emit('postDocument', reponseData)
-
-    //réinitialisation des données du composant
-    lesDatas.file = ref(null)    
-    if (suitesauve.value == "init") {
-        lesDatas.document.titre = titre.value
-        lesDatas.document.idFamille = ref(null)
-        //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
-        if (itemsFamille.value.length == 1) {
-            lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
-            itemsType.value = []
-            let itemT
-            for (let j=0; j<famillestypes.value[0].type.length; j++) {
-                itemT = {
-                    id: famillestypes.value[0].type[j].id,
-                    label: famillestypes.value[0].type[j].label,
-                    value: famillestypes.value[0].type[j].value,
+    //je ne comprends pas pourquoi que bien que je sois en await
+    //mon réponse data est parfois vide.
+    //Comme ça me gave... il y aura un petit délai
+    setTimeout(() => {
+        if (reponseData.hasOwnProperty("success")) {
+            if (reponseData.success) {
+                if (messageLog.value != '') {
+                    messageLog.value += '<br><br>'    
                 }
-                itemsType.value.push(itemT)
+                messageLog.value += `${reponseData.message}<br>iddocument: ${reponseData.iddocument}<br>titre: ${reponseData.titre}<br>taille: ${reponseData.taille} octets / md5: ${reponseData.md5}`    
+            } else {
+                messageLog.value += `<span style="color: red;">${reponseData.message}</span>`    
             }
+            emit('postDocument', reponseData)
+        } else {
+            //Pas de réponse prévue du serveur
+            const reponseErreurServeur = {
+                "success": false,
+                "message": 'Erreur imprevue pas de réponse du serveur',
+            }
+            emit('postDocument', reponseErreurServeur)
         }
-        lesDatas.document.idType = ref(null)
-        lesDatas.document.sujet = sujet.value
-        lesDatas.document.description = ''
-        lesDatas.document.commentaire = ''
-        lesDatas.document.dateOfficielle = ''
-        bDateOfficielleInconnue.value = false
-        lesDatas.document.idEmployeAuteur = 0
-        txtEmployeAuteur.value = ''
-        lesDatas.document.acteurAuteur = ref([])
-        bAuteurInconnu.value = false
-        lesDatas.document.documentIntExt = 'docInterne'
-        lesDatas.document.objetsLies = ref([])
-        //ajout des objets liés passés en paramètre
-        if (objetslies.value.length > 0) {
-            for (let i=0; i<objetslies.value.length; i++) {
-                ajoutObjetLie(objetslies.value[i].id)    
+    
+        //réinitialisation des données du composant
+        lesDatas.file = ref(null)    
+        if (suitesauve.value == "init") {
+            lesDatas.document.titre = titre.value
+            lesDatas.document.idFamille = ref(null)
+            //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
+            if (itemsFamille.value.length == 1) {
+                lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
+                itemsType.value = []
+                let itemT
+                for (let j=0; j<famillestypes.value[0].type.length; j++) {
+                    itemT = {
+                        id: famillestypes.value[0].type[j].id,
+                        label: famillestypes.value[0].type[j].label,
+                        value: famillestypes.value[0].type[j].value,
+                    }
+                    itemsType.value.push(itemT)
+                }
             }
-        } 
-        lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
-    }
-
+            lesDatas.document.idType = ref(null)
+            lesDatas.document.sujet = sujet.value
+            lesDatas.document.description = ''
+            lesDatas.document.commentaire = ''
+            lesDatas.document.dateOfficielle = ''
+            bDateOfficielleInconnue.value = false
+            lesDatas.document.idEmployeAuteur = 0
+            txtEmployeAuteur.value = ''
+            lesDatas.document.acteurAuteur = ref([])
+            bAuteurInconnu.value = false
+            lesDatas.document.documentIntExt = 'docInterne'
+            lesDatas.document.objetsLies = ref([])
+            //ajout des objets liés passés en paramètre
+            if (objetslies.value.length > 0) {
+                for (let i=0; i<objetslies.value.length; i++) {
+                    ajoutObjetLie(objetslies.value[i].id)    
+                }
+            } 
+            lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
+        }
+    }, 500)
 }
 
 onMounted(async () => {

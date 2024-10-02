@@ -23,7 +23,7 @@
         :objetslies="lesDatasIni.objetslies"
         :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
         :sizemax="lesDatasIni.sizemax"
-        suitesauve="keep"
+        suitesauve="init"
         @postDocument="receptionDocumentPost"
     ></DocumentPost>
 </template>
@@ -99,6 +99,9 @@ if (propsIni.hasOwnProperty("objetslies")) {
 }
 
 if (configIni !== null) {
+  if (configIni.hasOwnProperty("titre")) {
+    lesDatasIni.value.titre = configIni.titre
+  }
   if (configIni.hasOwnProperty("objetslies")) {
     lesDatasIni.value.objetslies = configIni.objetslies
   }

@@ -15,7 +15,7 @@ export const documentPostProps = {
       type: Array,
       default() {
         return [
-            {
+          {
             id: 7,
             label: 'Correspondance',
             value: '7',
@@ -51,6 +51,45 @@ export const documentPostProps = {
                   id: 20,
                   label: 'png',
                   value: '20',
+              },
+            ],
+          },
+          {
+            id: 11,
+            label: 'Plan',
+            value: '11',
+            type: [
+              {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+              },
+            ],
+          },
+          {
+            id: 18,
+            label: 'Procès verbal, notes de séance',
+            value: '18',
+            type: [
+              {
+                id: 15,
+                label: 'pdf',
+                value: '15',
+              },
+              {
+                id: 21,
+                label: 'docx',
+                value: '21',
+              },
+              {
+                id: 27,
+                label: 'odt',
+                value: '27',
+              },
+              {
+                id: 18,
+                label: 'txt',
+                value: '18',
               },
             ],
           },
@@ -129,6 +168,45 @@ export const documentPostProps = {
                     id: 20,
                     label: 'png',
                     value: '20',
+                },
+              ],
+            },
+            {
+              id: 11,
+              label: 'Plan',
+              value: '11',
+              type: [
+                {
+                    id: 15,
+                    label: 'pdf',
+                    value: '15',
+                },
+              ],
+            },
+            {
+              id: 18,
+              label: 'Procès verbal, notes de séance',
+              value: '18',
+              type: [
+                {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+                },
+                {
+                  id: 21,
+                  label: 'docx',
+                  value: '21',
+                },
+                {
+                  id: 27,
+                  label: 'odt',
+                  value: '27',
+                },
+                {
+                  id: 18,
+                  label: 'txt',
+                  value: '18',
                 },
               ],
             },

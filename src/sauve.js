@@ -76,7 +76,7 @@ export const demandeSauveData = async () => {
 
     // Ajout des métadonnées JSON au FormData
     console.log(metadata)
-     formData.append('metadata', JSON.stringify(metadata))
+    formData.append('metadata', JSON.stringify(metadata))
    
     const reponseData = await uploadFile(formData)
     return(reponseData)
