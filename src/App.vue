@@ -29,6 +29,7 @@ if (urlParams.has('jsonprms')) {
   const jsonprms = urlParams.get('jsonprms')
   jsonParams.value = decodeURIComponent(jsonprms)
   //console.log(jsonParams.value)
+  console.log(encodeURIComponent(`{"titre":"Gare 22 - ","sujet":"#444","auteursacteur":[10000],"objetslies":[1000,10000]}"`))
 }
 
 </script>

@@ -13,7 +13,7 @@ export const verifieNouveauMD5 = async () => {
     const fileContents = await readFileAsArrayBuffer(lesDatas.file)
     const wordArray = CryptoJS.lib.WordArray.create(fileContents)
     strMD5 = CryptoJS.MD5(wordArray).toString()
-    console.log(`md5: ${strMD5}`)    
+    //console.log(`md5: ${strMD5}`)    
     const docListe = await documentListeParMD5(strMD5)
     if (docListe.length > 0) {
         lesDatas.messagesErreur.timeOutSnackbar = 60000
@@ -25,8 +25,8 @@ export const verifieNouveauMD5 = async () => {
         lesDatas.controle.bDataFileOK = true
         return true
     }
-
 }
+
 export const demandeSauveData = async () => {
     const lesDatas = data()
     let strMD5 = ''

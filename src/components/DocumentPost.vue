@@ -349,7 +349,7 @@ import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
 import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
-import { objetInfoParId } from '..//axioscalls.js'
+import { objetInfoParId, employeInfoParId, acteurInfoParId } from '..//axioscalls.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 
@@ -365,6 +365,10 @@ lesDatas.document.titre = titre.value
 const { famillestypes } = toRefs(props)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = sujet.value
+//auteuremploye, traitement special dans onmounted pour récupérer pour l'affichage le nom selon le id
+const {auteuremploye} = toRefs(props)
+//auteursacteur, traitement special dans onmounted pour récupérer pour l'affichage le nom selon le id
+const {auteursacteur} = toRefs(props)
 //objetslies, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
 const { objetslies } = toRefs(props)
 const { idniveauconfidentialite } = toRefs(props)
@@ -726,74 +730,139 @@ const sauveData = async () => {
     const reponseData = await demandeSauveData()
     //je ne comprends pas pourquoi que bien que je sois en await
     //mon réponse data est parfois vide.
-    //Comme ça me gave... il y aura un petit délai
-    setTimeout(() => {
-        if (reponseData.hasOwnProperty("success")) {
-            if (reponseData.success) {
-                if (messageLog.value != '') {
-                    messageLog.value += '<br><br>'    
-                }
-                messageLog.value += `${reponseData.message}<br>iddocument: ${reponseData.iddocument}<br>titre: ${reponseData.titre}<br>taille: ${reponseData.taille} octets / md5: ${reponseData.md5}`    
-            } else {
-                messageLog.value += `<span style="color: red;">${reponseData.message}</span>`    
+    //Comme ça me gave... il peu y avoir un petit délai
+    if (reponseData.hasOwnProperty("success")) {
+        logEmitInit(reponseData)    
+    } else {
+        let bOk = false;
+        for (let i=0; i<20; i++) {            
+            setTimeout(() => {
+                console.log(`setTimeout ${i.toString()}`)
+                if (reponseData.hasOwnProperty("success")) {
+                    bOk = true
+                    logEmitInit(reponseData)
+                }                
+            }, 500)
+            if (bOk) {
+                break;
             }
-            emit('postDocument', reponseData)
+        }
+        if (!bOk) {
+            logEmitInit(reponseData)    
+        }
+    }
+}
+
+const logEmitInit = (reponseData) => {
+    if (reponseData.hasOwnProperty("success")) {
+        if (reponseData.success) {
+            if (messageLog.value != '') {
+                messageLog.value += '<br><br>'    
+            }
+            messageLog.value += `${reponseData.message}<br>iddocument: <a href="/goeland/document/document_data.php?iddocument=${reponseData.iddocument}" target="_blank">${reponseData.iddocument}</a><br>titre: ${reponseData.titre}<br>taille: ${reponseData.taille} octets / md5: ${reponseData.md5}`    
         } else {
-            //Pas de réponse prévue du serveur
-            const reponseErreurServeur = {
-                "success": false,
-                "message": 'Erreur imprevue pas de réponse du serveur',
-            }
-            emit('postDocument', reponseErreurServeur)
+            messageLog.value += `<span style="color: red;">${reponseData.message}</span>`    
         }
-    
-        //réinitialisation des données du composant
-        lesDatas.file = ref(null)    
-        if (suitesauve.value == "init") {
-            lesDatas.document.titre = titre.value
-            lesDatas.document.idFamille = ref(null)
-            //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
-            if (itemsFamille.value.length == 1) {
-                lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
-                itemsType.value = []
-                let itemT
-                for (let j=0; j<famillestypes.value[0].type.length; j++) {
-                    itemT = {
-                        id: famillestypes.value[0].type[j].id,
-                        label: famillestypes.value[0].type[j].label,
-                        value: famillestypes.value[0].type[j].value,
-                    }
-                    itemsType.value.push(itemT)
-                }
-            }
-            lesDatas.document.idType = ref(null)
-            lesDatas.document.sujet = sujet.value
-            lesDatas.document.description = ''
-            lesDatas.document.commentaire = ''
-            lesDatas.document.dateOfficielle = ''
-            bDateOfficielleInconnue.value = false
-            lesDatas.document.idEmployeAuteur = 0
-            txtEmployeAuteur.value = ''
-            lesDatas.document.acteurAuteur = ref([])
-            bAuteurInconnu.value = false
-            lesDatas.document.documentIntExt = 'docInterne'
-            lesDatas.document.objetsLies = ref([])
-            //ajout des objets liés passés en paramètre
-            if (objetslies.value.length > 0) {
-                for (let i=0; i<objetslies.value.length; i++) {
-                    ajoutObjetLie(objetslies.value[i].id)    
-                }
-            } 
-            lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
+        emit('postDocument', reponseData)
+    } else {
+        //Pas de réponse prévue du serveur
+        const reponseErreurServeur = {
+            "success": false,
+            "message": 'Erreur imprevue pas de réponse du serveur',
         }
-    }, 500)
+        emit('postDocument', reponseErreurServeur)
+    }
+
+    //réinitialisation des données du composant
+    lesDatas.file = ref(null)    
+    if (suitesauve.value == "init") {
+        lesDatas.document.titre = titre.value
+        lesDatas.document.idFamille = ref(null)
+        //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
+        if (itemsFamille.value.length == 1) {
+            lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
+            itemsType.value = []
+            let itemT
+            for (let j=0; j<famillestypes.value[0].type.length; j++) {
+                itemT = {
+                    id: famillestypes.value[0].type[j].id,
+                    label: famillestypes.value[0].type[j].label,
+                    value: famillestypes.value[0].type[j].value,
+                }
+                itemsType.value.push(itemT)
+            }
+        }
+        lesDatas.document.idType = ref(null)
+        lesDatas.document.sujet = sujet.value
+        lesDatas.document.description = ''
+        lesDatas.document.commentaire = ''
+        lesDatas.document.dateOfficielle = ''
+        bDateOfficielleInconnue.value = false
+        lesDatas.document.idEmployeAuteur = 0
+        txtEmployeAuteur.value = ''
+        lesDatas.document.acteurAuteur = ref([])
+        bAuteurInconnu.value = false
+        lesDatas.document.documentIntExt = 'docInterne'
+        lesDatas.document.objetsLies = ref([])
+        //ajout des objets liés passés en paramètre
+        if (objetslies.value.length > 0) {
+            for (let i=0; i<objetslies.value.length; i++) {
+                ajoutObjetLie(objetslies.value[i])    
+            }
+        } 
+        lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
+    }
 }
 
 onMounted(async () => {
+    //traitement auteuremploye passé en paramètre
+    if (auteuremploye.value != '') {
+        //console.log(auteuremploye.value)
+        const idEmployeAuteurPrm = auteuremploye.value
+        const employeAuteurInfo = await employeInfoParId(idEmployeAuteurPrm)
+        //console.log(employeAuteurInfo)
+        if (employeAuteurInfo.length != 0) {
+            const oEmployeAuteur = employeAuteurInfo[0]
+            lesDatas.document.documentIntExt = 'docInterne'
+            lesDatas.document.idEmployeAuteur = idEmployeAuteurPrm
+            txtEmployeAuteur.value = `${oEmployeAuteur.nom} ${oEmployeAuteur.prenom}. ${oEmployeAuteur.unite}`
+        }
+    }
+
+    //traitement auteursacteur passé en paramètre. Si auteuremploye passé, auteursacteur ignoré
+    //console.log(auteursacteur.value)
+    if (auteuremploye.value == '' && auteursacteur.value.length > 0) {
+        lesDatas.document.documentIntExt = 'docExterne'
+        for (let i=0; i<auteursacteur.value.length; i++) {
+            const idActeurAuteurPrm = auteursacteur.value[i]
+            //On vérifie que la liste passée en paramètre n'a pas de doublon
+            let bTrouve = false
+            if (lesDatas.document.acteurAuteur.length > 0) {
+                for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
+                    if (lesDatas.document.acteurAuteur[i].id == idActeurAuteurPrm) {
+                        bTrouve = true
+                        break
+                    }
+                }
+            }
+            if (!bTrouve) {
+                const acteurAuteurInfo = await acteurInfoParId(idActeurAuteurPrm)
+                //console.log(acteurAuteurInfo)
+                if (acteurAuteurInfo.length != 0) {
+                    const acteurA = {
+                        id: acteurAuteurInfo[0].acteurid,
+                        nom: acteurAuteurInfo[0].acteurnom,
+                    }
+                    lesDatas.document.acteurAuteur.push(acteurA)
+                }
+            }                       
+        }
+    }
+
     //ajout des objets liés passés en paramètre
     if (objetslies.value.length > 0) {
         for (let i=0; i<objetslies.value.length; i++) {
-            ajoutObjetLie(objetslies.value[i].id)    
+            ajoutObjetLie(objetslies.value[i])    
         }
     } 
 })

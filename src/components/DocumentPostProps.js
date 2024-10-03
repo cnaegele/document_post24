@@ -102,6 +102,18 @@ export const documentPostProps = {
         return ''
       } 
     },
+    auteuremploye: {
+      type: String,
+      default() {
+        return ''
+      }
+    },
+    auteursacteur: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
     objetslies: {
       type: Array,
       default() {

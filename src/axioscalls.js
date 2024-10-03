@@ -6,6 +6,8 @@ if (import.meta.env.DEV) {
 }
 const g_pathurl = '/goeland/document/axios/'
 const g_pathurlobjet = '/goeland/objet/axios/'
+const g_pathurlemploye = '/goeland/employe/axios/'
+const g_pathurlacteur = '/goeland/acteur/ajax/'
 
 export async function getConfigurationInitiale(codeConfig) {
     const urlcoi = `${g_devurl}${g_pathurl}document_nouveau_configuration.php`
@@ -30,6 +32,26 @@ export async function documentListeParMD5(strMD5) {
     const urldlm = `${g_devurl}${g_pathurl}document_liste_parmd5.php`
     const params = new URLSearchParams([['md5', strMD5]])
     const response = await axios.get(urldlm, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
+export async function employeInfoParId(idEmploye) {
+    const urlei = `${g_devurl}${g_pathurlemploye}employe_information_parid.php`
+    const params = new URLSearchParams([['idemploye', idEmploye]])
+    const response = await axios.get(urlei, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
+export async function acteurInfoParId(idActeur) {
+    const urlad = `${g_devurl}${g_pathurlacteur}acteur_data.php`
+    const params = new URLSearchParams([['idacteur', idActeur]])
+    const response = await axios.get(urlad, { params })
         .catch(function (error) {
             return traiteAxiosError(error)
         })

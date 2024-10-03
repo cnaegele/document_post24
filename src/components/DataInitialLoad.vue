@@ -20,6 +20,8 @@
         :titre="lesDatasIni.titre"
         :famillestypes="lesDatasIni.famillestypes"
         :sujet="lesDatasIni.sujet"
+        :auteuremploye="lesDatasIni.auteuremploye"
+        :auteursacteur="lesDatasIni.auteursacteur"
         :objetslies="lesDatasIni.objetslies"
         :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
         :sizemax="lesDatasIni.sizemax"
@@ -65,7 +67,9 @@ const lesDatasIni = ref(
     titre:  '',
     famillestypes: [],
     sujet:  '',
-    objetslies: [],
+    auteuremploye: '', // exemple: 7
+    auteursacteur: [], // exemple: [10000,10001]  
+    objetslies: [],    // exemple: [1000,10000]
     idniveauconfidentialite: '1',
     sizemax: 10000000,
   }
@@ -88,23 +92,41 @@ if (propsIni.hasOwnProperty("famillestypes")) {
 if (propsIni.hasOwnProperty("sujet")) {
     lesDatasIni.value.sujet = propsIni.sujet
 }
+if (propsIni.hasOwnProperty("auteuremploye")) {
+    lesDatasIni.value.auteuremploye = propsIni.auteuremploye
+}
+if (propsIni.hasOwnProperty("auteursacteur")) {
+    lesDatasIni.value.auteursacteur = propsIni.auteursacteur
+}
+if (propsIni.hasOwnProperty("objetslies")) {
+    lesDatasIni.value.objetslies = propsIni.objetslies
+}
 if (propsIni.hasOwnProperty("idniveauconfidentialite")) {
     lesDatasIni.value.idniveauconfidentialite = propsIni.idniveauconfidentialite
 }
 if (propsIni.hasOwnProperty("sizemax")) {
     lesDatasIni.value.sizemax = propsIni.sizemax
 }
-if (propsIni.hasOwnProperty("objetslies")) {
-    lesDatasIni.value.objetslies = propsIni.objetslies
-}
 
 if (configIni !== null) {
   if (configIni.hasOwnProperty("titre")) {
     lesDatasIni.value.titre = configIni.titre
   }
+  if (configIni.hasOwnProperty("sujet")) {
+    lesDatasIni.value.sujet = configIni.sujet
+  }
+  if (configIni.hasOwnProperty("auteuremploye")) {
+    lesDatasIni.value.auteuremploye = configIni.auteuremploye
+  }
+  if (configIni.hasOwnProperty("auteursacteur")) {
+    lesDatasIni.value.auteursacteur = configIni.auteursacteur
+  }
   if (configIni.hasOwnProperty("objetslies")) {
     lesDatasIni.value.objetslies = configIni.objetslies
   }
+  // exemple : /?jsonprms=%7B"titre"%3A"Gare%2022%20-%20"%2C"sujet"%3A"%23444"%2C"auteursacteur"%3A%5B10000%5D%2C"objetslies"%3A%5B1000%2C10000%5D%7D
+  // avec : %7B"titre"%3A"Gare%2022%20-%20"%2C"sujet"%3A"%23444"%2C"auteursacteur"%3A%5B10000%5D%2C"objetslies"%3A%5B1000%2C10000%5D%7D 
+  //qui est le encodeURIComponent de: {"titre":"Gare 22 - ","sujet":"#444","auteursacteur":[10000],"objetslies":[1000,10000]}
 }
 //console.log(lesDatasIni.value)
 
