@@ -57,6 +57,7 @@ export const data = defineStore({
             /*
                 id: ref(0),
                 nom: ref(''),
+                description: ref('')
             */        
        },
         controle: {

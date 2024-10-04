@@ -306,7 +306,7 @@
                                         <v-btn
                                             v-bind="props"
                                             rounded="lg"
-                                            @click.stop="choixGroupeSecuriteConsultation('unique')"
+                                            @click.stop="choixGroupesSecuriteDroitConsultation('unique')"
                                         >+1</v-btn>
                                     </template>        
                                 </v-tooltip>
@@ -317,7 +317,7 @@
                                             class="text-lowercase"
                                             v-bind="props"
                                             rounded="lg"
-                                            @click.stop="choixGroupeSecuriteConsultation('multiple')"
+                                            @click.stop="choixGroupesSecuriteDroitConsultation('multiple')"
                                         >+n</v-btn>
                                     </template>        
                                 </v-tooltip>
@@ -362,7 +362,28 @@
                                 </v-tooltip>
                             </v-col>
                             <v-col cols="12" md="11">
-                            {{ uniteorgdc.nom }}
+                                {{ uniteorgdc.nom }}
+                            </v-col>
+                        </v-row>
+
+                        <v-row dense v-for="(groupesecuritedc, index) in lesDatas.document.groupesSecuriteDroitConsultation" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le droit groupe de sécurité">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeGroupeSecuriteDroitConsultation(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="5">
+                                {{ groupesecuritedc.nom }}
+                            </v-col>
+                            <v-col cols="12" md="5">
+                                {{ groupesecuritedc.description }}
                             </v-col>
                         </v-row>
                     </v-container>
@@ -538,6 +559,42 @@
     </template>
   </v-dialog>
 
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
+          id="btnActiveCardChoixGroupeSecuriteDC"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+            <span v-if="modeChoixGroupeSecuriteDC == 'multiple'" class="cardTitre"><h3>Choix de groupes de sécurité</h3></span>
+            <span v-else class="cardTitre"><h3>Choix d'un groupe de sécurité</h3></span>
+            <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardGroupeSecuriteDCChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <Suspense>
+                    <GroupeSecuriteChoix 
+                        :modeChoix="modeChoixGroupeSecuriteDC"
+                        @choixGroupeSecurite="receptionGroupesSecuriteDroitConsultation"
+                    />
+                </Suspense>
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
 </template>
   
 <script setup>
@@ -550,6 +607,7 @@ import { objetInfoParId, employeInfoParId, acteurInfoParId } from '..//axioscall
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 import UniteOrgChoix from '../../../uniteorgchoix/src/components/UniteOrgChoix.vue';
+import GroupeSecuriteChoix from '../../../groupesecuritechoix/src/components/GroupeSecuriteChoix.vue';
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
@@ -617,6 +675,7 @@ const inpIdObjetLieAjout = ref(null)
 const panelDroitsConsultation = ref([])
 const modeChoixEmployeDC = ref('unique')
 const modeChoixUniteOrgDC = ref('unique')
+const modeChoixGroupeSecuriteDC = ref('unique')
 
 const messageLog = ref('')
 
@@ -1006,6 +1065,41 @@ const closeCardUniteOrgDCChoix = () => {
 }
 const supprimeUniteOrgDroitConsultation = (index) => {
     lesDatas.document.unitesOrgDroitConsultation.splice(index, 1)
+}
+
+const choixGroupesSecuriteDroitConsultation = (modeChoix) => {
+    modeChoixGroupeSecuriteDC.value = modeChoix
+    document.getElementById("btnActiveCardChoixGroupeSecuriteDC").click() 
+}
+const receptionGroupesSecuriteDroitConsultation = (jsonData) => {
+    //console.log(`Réception groupe sécurité \njson: ${jsonData}`)
+    const aGroupesSecuriteDC = JSON.parse(jsonData)
+    for (let i=0; i<aGroupesSecuriteDC.length; i++) {
+        let bTrouve = false
+        for (let j=0; j<lesDatas.document.groupesSecuriteDroitConsultation.length; j++) {
+            if (aGroupesSecuriteDC[i].id == lesDatas.document.groupesSecuriteDroitConsultation[j].id) {
+                bTrouve= true
+                break
+            }
+        }
+        if (!bTrouve) {
+            const oGroupeSecuriteDCPlus = {
+                "id": aGroupesSecuriteDC[i].id,
+                "nom": aGroupesSecuriteDC[i].nom,
+                "description": aGroupesSecuriteDC[i].description,
+            }
+            lesDatas.document.groupesSecuriteDroitConsultation.push(oGroupeSecuriteDCPlus)
+        }
+    }
+    closeCardGroupeSecuriteDCChoix()
+    panelDroitsConsultation.value = [0]
+    console.log(lesDatas.document.groupesSecuriteDroitConsultation)
+}
+const closeCardGroupeSecuriteDCChoix = () => {
+  document.getElementById("btnActiveCardChoixGroupeSecuriteDC").click()    
+}
+const supprimeGroupeSecuriteDroitConsultation = (index) => {
+    lesDatas.document.groupesSecuriteDroitConsultation.splice(index, 1)
 }
 
 const sauveData = async () => {
