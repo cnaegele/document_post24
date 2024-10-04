@@ -246,7 +246,130 @@
         </v-col>
     </v-row>
     <v-row v-if="lesDatas.document.idNiveauConfidentialite != '0' && lesDatas.document.idNiveauConfidentialite != '1'" dense>
-        <v-col cols="12">...droits de consultation...</v-col>
+        <v-col cols="12">
+            <v-expansion-panels v-model="panelDroitsConsultation">
+            <v-expansion-panel>
+                <v-expansion-panel-title>
+                    <v-container>
+                        <v-row dense>
+                            <v-col class="titreChampSaisie">Droits de consultation</v-col>
+                            <v-col>
+                                Employés
+                                <v-tooltip text="ajouter un employé">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixEmployesDroitConsultation('unique')"
+                                        >+1</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                                &nbsp;
+                                <v-tooltip text="ajouter des employés">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            class="text-lowercase"
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixEmployesDroitConsultation('multiple')"
+                                        >+n</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col>
+                                Unités
+                                <v-tooltip text="ajouter une unité organisationnelle">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixUnitesOrgDroitConsultation('unique')"
+                                        >+1</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                                &nbsp;
+                                <v-tooltip text="ajouter des unités organisationnelle">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            class="text-lowercase"
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixUnitesOrgDroitConsultation('multiple')"
+                                        >+n</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col>
+                                Groupes
+                                <v-tooltip text="ajouter un groupe de sécurité">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixGroupeSecuriteConsultation('unique')"
+                                        >+1</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                                &nbsp;
+                                <v-tooltip text="ajouter des groupes de sécurité">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            class="text-lowercase"
+                                            v-bind="props"
+                                            rounded="lg"
+                                            @click.stop="choixGroupeSecuriteConsultation('multiple')"
+                                        >+n</v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>  
+                    <v-container>
+                        <v-row dense v-for="(employedc, index) in lesDatas.document.employesDroitConsultation" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le droit employé">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeEmployeDroitConsultation(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="5">
+                            {{ employedc.nom }} {{ employedc.prenom }}
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                {{ employedc.unite }}
+                            </v-col>
+                        </v-row>
+
+                        <v-row dense v-for="(uniteorgdc, index) in lesDatas.document.unitesOrgDroitConsultation" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le droit unité organisationnelle">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeUniteOrgDroitConsultation(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="11">
+                            {{ uniteorgdc.nom }}
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+            </v-expansion-panels>    
+        </v-col>
     </v-row>
     <v-row dense>
         <v-col cols="12">
@@ -341,9 +464,83 @@
     </template>
   </v-dialog>
 
-  </template>
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
+          id="btnActiveCardChoixEmployeDC"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+            <span v-if="modeChoixEmployeDC == 'multiple'" class="cardTitre"><h3>Choix d'employés</h3> (cliquez sur le nom pour sélectionner)</span>
+            <span v-else class="cardTitre"><h3>Choix d'un employé</h3> (cliquez sur le nom pour sélectionner)</span>
+            <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardEmployeDCChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <Suspense>
+                    <EmployeChoix 
+                        uniteHorsVdL="non" 
+                        :modeChoix="modeChoixEmployeDC"
+                        @choixEmploye="receptionEmployesDroitConsultation"
+                    />
+                </Suspense>
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
+          id="btnActiveCardChoixUniteOrgDC"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+            <span v-if="modeChoixUniteOrgDC == 'multiple'" class="cardTitre"><h3>Choix d'unités organisationnelle</h3></span>
+            <span v-else class="cardTitre"><h3>Choix d'une unité organisationnelle</h3> (cliquez sur le nom pour sélectionner)</span>
+            <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardUniteOrgDCChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <Suspense>
+                    <UniteOrgChoix 
+                        uniteHorsVdL="non" 
+                        :modeChoix="modeChoixUniteOrgDC"
+                        @choixUniteOrg="receptionUnitesOrgDroitConsultation"
+                    />
+                </Suspense>
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
+</template>
   
- <script setup>
+<script setup>
 import { ref, onMounted, toRefs, watch } from 'vue'
 import { data } from '@/stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
@@ -352,6 +549,7 @@ import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
 import { objetInfoParId, employeInfoParId, acteurInfoParId } from '..//axioscalls.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
+import UniteOrgChoix from '../../../uniteorgchoix/src/components/UniteOrgChoix.vue';
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
@@ -415,6 +613,11 @@ const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou 
 const panelObjetsLies = ref([])
 const idObjetLieAjout = ref('')
 const inpIdObjetLieAjout = ref(null)
+
+const panelDroitsConsultation = ref([])
+const modeChoixEmployeDC = ref('unique')
+const modeChoixUniteOrgDC = ref('unique')
+
 const messageLog = ref('')
 
 const titreRules = [
@@ -724,6 +927,85 @@ const ajoutObjetLie = async (idObjetPrm) => {
 
 const supprimeLienObjet = (index) => {
     lesDatas.document.objetsLies.splice(index, 1)
+}
+
+const choixEmployesDroitConsultation = (modeChoix) => {
+    modeChoixEmployeDC.value = modeChoix
+    document.getElementById("btnActiveCardChoixEmployeDC").click() 
+}
+const receptionEmployesDroitConsultation = (idemploye, jsonData) => {
+    const retEmployesDC = JSON.parse(jsonData)
+    let aEmployesDC = []
+    if (Array.isArray(retEmployesDC)) {
+        aEmployesDC = retEmployesDC    
+    } else {
+        aEmployesDC.push(retEmployesDC)   
+    }
+    for (let i=0; i<aEmployesDC.length; i++) {
+        let bTrouve = false
+        for (let j=0; j<lesDatas.document.employesDroitConsultation.length; j++) {
+            if (aEmployesDC[i].idemploye == lesDatas.document.employesDroitConsultation[j].id) {
+                bTrouve= true
+                break
+            }
+        }
+        if (!bTrouve) {
+            const oEmployeDCPlus = {
+                "id": aEmployesDC[i].idemploye,
+                "nom": aEmployesDC[i].nom,
+                "prenom": aEmployesDC[i].prenom,
+                "unite": aEmployesDC[i].unite,
+            }
+            lesDatas.document.employesDroitConsultation.push(oEmployeDCPlus)
+        }
+    }
+    closeCardEmployeDCChoix()
+    panelDroitsConsultation.value = [0]
+}
+const closeCardEmployeDCChoix = () => {
+  document.getElementById("btnActiveCardChoixEmployeDC").click()    
+}
+const supprimeEmployeDroitConsultation = (index) => {
+    lesDatas.document.employesDroitConsultation.splice(index, 1)
+}
+
+const choixUnitesOrgDroitConsultation = (modeChoix) => {
+    modeChoixUniteOrgDC.value = modeChoix
+    document.getElementById("btnActiveCardChoixUniteOrgDC").click() 
+}
+const receptionUnitesOrgDroitConsultation = (jsonData) => {
+    //console.log(`Réception unité organisationnelle \njson: ${jsonData}`)
+    const retUnitesOrgDC = JSON.parse(jsonData)
+    let aUnitesOrgDC = []
+    if (Array.isArray(retUnitesOrgDC)) {
+        aUnitesOrgDC = retUnitesOrgDC    
+    } else {
+        aUnitesOrgDC.push(retUnitesOrgDC)   
+    }
+    for (let i=0; i<aUnitesOrgDC.length; i++) {
+        let bTrouve = false
+        for (let j=0; j<lesDatas.document.unitesOrgDroitConsultation.length; j++) {
+            if (aUnitesOrgDC[i].id == lesDatas.document.unitesOrgDroitConsultation[j].id) {
+                bTrouve= true
+                break
+            }
+        }
+        if (!bTrouve) {
+            const oUniteOrgDCPlus = {
+                "id": aUnitesOrgDC[i].id,
+                "nom": aUnitesOrgDC[i].description,
+            }
+            lesDatas.document.unitesOrgDroitConsultation.push(oUniteOrgDCPlus)
+        }
+    }
+    closeCardUniteOrgDCChoix()
+    panelDroitsConsultation.value = [0]
+}
+const closeCardUniteOrgDCChoix = () => {
+  document.getElementById("btnActiveCardChoixUniteOrgDC").click()    
+}
+const supprimeUniteOrgDroitConsultation = (index) => {
+    lesDatas.document.unitesOrgDroitConsultation.splice(index, 1)
 }
 
 const sauveData = async () => {

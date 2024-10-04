@@ -40,7 +40,24 @@ export const data = defineStore({
                 type: ref(''),
                 nom: ref('')
             */
-            idNiveauConfidentialite: ref('1')
+            idNiveauConfidentialite: ref('1'),
+            employesDroitConsultation: ref([]),
+            /*
+                id: ref(0),
+                nom: ref(''),
+                prenom: ref(''),
+                unite: ref('')
+            */
+            unitesOrgDroitConsultation: ref([]),
+            /*
+                id: ref(0),
+                nom: ref(''),
+            */
+            groupesSecuriteDroitConsultation: ref([]),
+            /*
+                id: ref(0),
+                nom: ref(''),
+            */        
        },
         controle: {
             bDataFileOK: ref(true),
