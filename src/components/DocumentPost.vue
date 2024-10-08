@@ -598,11 +598,11 @@
   
 <script setup>
 import { ref, onMounted, toRefs, watch } from 'vue'
-import { data } from '@/stores/data.js'
+import { data } from '../stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
-import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
-import { objetInfoParId, employeInfoParId, acteurInfoParId } from '..//axioscalls.js'
+import { verifieNouveauMD5, demandeSauveData } from '../sauve.js'
+import { objetInfoParId, employeInfoParId, acteurInfoParId } from '../axioscalls.js'
 import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
 import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
 import UniteOrgChoix from '../../../uniteorgchoix/src/components/UniteOrgChoix.vue';

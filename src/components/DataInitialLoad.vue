@@ -25,6 +25,7 @@
       ></v-btn>
     </template>
   </v-snackbar>
+  <Suspense>
   <DocumentPost
       :libelle="lesDatasIni.libelle"
       :titre="lesDatasIni.titre"
@@ -38,6 +39,7 @@
       :suitesauve="suiteSauveDP"
       @postDocument="receptionDocumentPost"
   ></DocumentPost>
+  </Suspense>
 
   <v-btn
     v-if="suitesauve == 'emitdocsinit' || suitesauve == 'emitdocskeep'"

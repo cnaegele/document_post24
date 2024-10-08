@@ -1,0 +1,171 @@
+Composant DocumentPost
+--------------------------------
+
+Props
+
+libelle			string			''
+
+Première ligne du composant, pes de ligne si ''. Exemple: Indexation d'un document de la famille photo
+
+
+titre				string			''
+
+Contenu initial du champ Titre
+
+
+famillestypes		array			voir sous note1 la valeur par défaut
+
+
+sujet			string			''
+
+Contenu initial du champ Sujet
+
+
+auteuremploye	string			''	note2
+
+identifiant (numerique) de l'employe auteur du document
+
+
+auteuracteur		array			[]	note2
+
+identifiant (numérique) du (des) acteur(s) auteur du document
+
+
+objetslies			array			[]	
+
+identifiant (numérique) du (des) objet(s) lié(s) au document. Initialise la liste des objets liés qui peut être modifiée avec l'interface
+
+
+sizemax			number			10000000 
+Taille (en octets) maximum du fichier que l'interface acceptera de traiter (défaut 10 Mo)
+Pas plus de 200 Mo sinon il y a blocage au niveau du serveur ( php: upload_max_filesize 222 M)
+
+
+suitesauve		string			init
+Comportement du composant suite à la sauvegarde
+init : réinitialise tous les champs ave les valeurs par défaut
+keep : garde les valeurs saisies sauf le champ qui défini le fichier à indexer.
+
+
+Event
+
+postDocument 	string json
+{
+	success: true / false,
+	message: ........,
+	fileName: fileNameClient -> fileNameUnique (php upload) -> nomFichier (goeland repository),
+	titre: titre du document,
+	iddocument: nnnnnn,
+	taille: xxxxxx (en octet),
+	md5: chaine MD5 de 32 caractères,
+}
+
+
+Exemple simple d'utilisation :
+<template>
+  <Suspense>
+  <DocumentPost
+      libelle="'Indexation d'un procès-verbal'"
+      titre="'Procès-verbal du'"
+      famillestypes="'[{id: 18,label: 'Procès verbal, notes de séance',value: '18',type: [{id: 15,label: 'pdf', value: '15',}]}]'"
+      @postDocument="receptionDocumentPost"
+  ></DocumentPost>
+  </Suspense>
+</template>
+
+<script setup>
+import EmployeChoix from '----------/document_post24/src/components/DocumentPost.vue'
+
+const receptionDocumentPost = (responseData) => {
+  console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
+}
+</script>
+
+
+note1: famillestypes par défaut
+[
+          {
+            id: 7,
+            label: 'Correspondance',
+            value: '7',
+            type: [
+              {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+              },
+              {
+                  id: 18,
+                  label: 'txt',
+                  value: '18',
+              },
+            ],
+          },
+          {
+            id: 5,
+            label: 'Photo',
+            value: '5',
+            type: [
+              {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+              },
+              {
+                  id: 5,
+                  label: 'jpg',
+                  value: '5',
+              },
+              {
+                  id: 20,
+                  label: 'png',
+                  value: '20',
+              },
+            ],
+          },
+          {
+            id: 11,
+            label: 'Plan',
+            value: '11',
+            type: [
+              {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+              },
+            ],
+          },
+          {
+            id: 18,
+            label: 'Procès verbal, notes de séance',
+            value: '18',
+            type: [
+              {
+                id: 15,
+                label: 'pdf',
+                value: '15',
+              },
+              {
+                id: 21,
+                label: 'docx',
+                value: '21',
+              },
+              {
+                id: 27,
+                label: 'odt',
+                value: '27',
+              },
+              {
+                id: 18,
+                label: 'txt',
+                value: '18',
+              },
+            ],
+          },
+        ]
+
+	  
+note2: auteuremploye / auteursacteur
+Si un document a un auteur employé, c'est un document interne, si il a un (des) auteurs acteur, c'est un document externe
+Il ne peut y avoir qu'un seul auteur employé, mais il peut y avoir plusieurs auteurs acteur
+Si on passe au composant les 2 propriétés auteuremploye et auteursacteur et que auteuremploye n'est pas égal à '', la propriété auteursacteur sera ignorée	  
