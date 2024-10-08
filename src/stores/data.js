@@ -4,8 +4,8 @@ export const data = defineStore({
     id: 'iddata',
     state: () => ({
         env: {
-            version: ref('0.1.0'),
-            dateversion: ref('19.09.2024'),
+            version: ref('1.0.0'),
+            dateversion: ref('08.10.2024'),
             themeChoisi: ref(localStorage.getItem('themeChoisi') || 'dark'),
         },
         user: {

@@ -58,6 +58,28 @@ export const demandeSauveData = async () => {
             aIdObjetsLies.push(lesDatas.document.objetsLies[i].id)   
         }
     }
+
+    const aIdEmployesDroitConsultation = []
+    const aIdUnitesOrgDroitConsultation = []
+    const aIdGroupesSecuriteDroitConsultation = []
+    if (lesDatas.document.idNiveauConfidentialite != '0' && lesDatas.document.idNiveauConfidentialite != '1') {
+        if (lesDatas.document.employesDroitConsultation.length > 0) {
+            for (let i=0; i<lesDatas.document.employesDroitConsultation.length; i++) {
+                aIdEmployesDroitConsultation.push(lesDatas.document.employesDroitConsultation[i].id)   
+            }
+        }
+        if (lesDatas.document.unitesOrgDroitConsultation.length > 0) {
+            for (let i=0; i<lesDatas.document.unitesOrgDroitConsultation.length; i++) {
+                aIdUnitesOrgDroitConsultation.push(lesDatas.document.unitesOrgDroitConsultation[i].id)   
+            }
+        }
+        if (lesDatas.document.groupesSecuriteDroitConsultation.length > 0) {
+            for (let i=0; i<lesDatas.document.groupesSecuriteDroitConsultation.length; i++) {
+                aIdGroupesSecuriteDroitConsultation.push(lesDatas.document.groupesSecuriteDroitConsultation[i].id)   
+            }
+        }
+    }
+
     // Création de l'objet JSON avec les données attributaires
     const metadata = {
         titre: lesDatas.document.titre,
@@ -72,6 +94,9 @@ export const demandeSauveData = async () => {
         idniveauconfidentialite: lesDatas.document.idNiveauConfidentialite,
         idacteurauteur: aIdActeurAuteur,
         idobjetslies: aIdObjetsLies,
+        idEmployesDroitConsultation: aIdEmployesDroitConsultation,
+        idUnitesOrgDroitConsultation: aIdUnitesOrgDroitConsultation,
+        idGroupesSecuriteDroitConsultation: aIdGroupesSecuriteDroitConsultation,
     }
 
     // Ajout des métadonnées JSON au FormData

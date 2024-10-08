@@ -299,7 +299,7 @@
                                     </template>        
                                 </v-tooltip>
                             </v-col>
-                            <v-col>
+                            <v-col v-if="lesDatas.document.idNiveauConfidentialite == '5'">
                                 Groupes
                                 <v-tooltip text="ajouter un groupe de sécurité">
                                     <template v-slot:activator="{ props }">
@@ -594,7 +594,6 @@
       </v-card>
     </template>
   </v-dialog>
-
 </template>
   
 <script setup>
@@ -632,6 +631,8 @@ lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
 const { suitesauve } = toRefs(props) //init ou keep
+console.log(`DocumentPost: prm suitesauve: ${suitesauve.value}`)
+
 
 const itemsFamille = ref([])
 const itemsType = ref([])
@@ -1103,20 +1104,20 @@ const supprimeGroupeSecuriteDroitConsultation = (index) => {
 }
 
 const sauveData = async () => {
-    const reponseData = await demandeSauveData()
+    const responseData = await demandeSauveData()
     //je ne comprends pas pourquoi que bien que je sois en await
     //mon réponse data est parfois vide.
     //Comme ça me gave... il peu y avoir un petit délai
-    if (reponseData.hasOwnProperty("success")) {
-        logEmitInit(reponseData)    
+    if (responseData.hasOwnProperty("success")) {
+        logEmitInit(responseData)    
     } else {
         let bOk = false;
         for (let i=0; i<20; i++) {            
             setTimeout(() => {
                 console.log(`setTimeout ${i.toString()}`)
-                if (reponseData.hasOwnProperty("success")) {
+                if (responseData.hasOwnProperty("success")) {
                     bOk = true
-                    logEmitInit(reponseData)
+                    logEmitInit(responseData)
                 }                
             }, 500)
             if (bOk) {
@@ -1124,22 +1125,22 @@ const sauveData = async () => {
             }
         }
         if (!bOk) {
-            logEmitInit(reponseData)    
+            logEmitInit(responseData)    
         }
     }
 }
 
-const logEmitInit = (reponseData) => {
-    if (reponseData.hasOwnProperty("success")) {
-        if (reponseData.success) {
+const logEmitInit = (responseData) => {
+    if (responseData.hasOwnProperty("success")) {
+        if (responseData.success) {
             if (messageLog.value != '') {
                 messageLog.value += '<br><br>'    
             }
-            messageLog.value += `${reponseData.message}<br>iddocument: <a href="/goeland/document/document_data.php?iddocument=${reponseData.iddocument}" target="_blank">${reponseData.iddocument}</a><br>titre: ${reponseData.titre}<br>taille: ${reponseData.taille} octets / md5: ${reponseData.md5}`    
+            messageLog.value += `${responseData.message}<br>iddocument: <a href="/goeland/document/document_data.php?iddocument=${responseData.iddocument}" target="_blank">${responseData.iddocument}</a><br>titre: ${responseData.titre}<br>taille: ${responseData.taille} octets / md5: ${responseData.md5}`    
         } else {
-            messageLog.value += `<span style="color: red;">${reponseData.message}</span>`    
+            messageLog.value += `<span style="color: red;">${responseData.message}</span>`    
         }
-        emit('postDocument', reponseData)
+        emit('postDocument', responseData)
     } else {
         //Pas de réponse prévue du serveur
         const reponseErreurServeur = {

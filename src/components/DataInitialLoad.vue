@@ -1,3 +1,13 @@
+<style scoped>
+
+.floating-btn {
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+  z-index: 100;
+}
+</style>
+
 <template>
   <v-snackbar
     color="#FFCDD2"
@@ -15,24 +25,44 @@
       ></v-btn>
     </template>
   </v-snackbar>
-    <DocumentPost
-        :libelle="lesDatasIni.libelle"
-        :titre="lesDatasIni.titre"
-        :famillestypes="lesDatasIni.famillestypes"
-        :sujet="lesDatasIni.sujet"
-        :auteuremploye="lesDatasIni.auteuremploye"
-        :auteursacteur="lesDatasIni.auteursacteur"
-        :objetslies="lesDatasIni.objetslies"
-        :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
-        :sizemax="lesDatasIni.sizemax"
-        suitesauve="init"
-        @postDocument="receptionDocumentPost"
-    ></DocumentPost>
+  <DocumentPost
+      :libelle="lesDatasIni.libelle"
+      :titre="lesDatasIni.titre"
+      :famillestypes="lesDatasIni.famillestypes"
+      :sujet="lesDatasIni.sujet"
+      :auteuremploye="lesDatasIni.auteuremploye"
+      :auteursacteur="lesDatasIni.auteursacteur"
+      :objetslies="lesDatasIni.objetslies"
+      :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
+      :sizemax="lesDatasIni.sizemax"
+      :suitesauve="suiteSauveDP"
+      @postDocument="receptionDocumentPost"
+  ></DocumentPost>
+
+  <v-btn
+    v-if="suitesauve == 'emitdocsinit' || suitesauve == 'emitdocskeep'"
+    class="floating-btn"
+    color="primary"
+    fab
+    fixed
+    bottom
+    right
+    @click="emitdocs()"
+  >
+    Indexation terminée {{ suitesauve }}
+  </v-btn> 
+
 </template>
 
 <script setup>
 import { ref, toRefs } from 'vue'
 import { documentPostPropsIni } from '../configurationini.js'
+
+const emit = defineEmits(['postDocument'])
+const postDocument = (jsonDocument) => {
+    emit('postDocument', jsonDocument)
+}
+
 //codeConfigIni renvoie vers un fichier de configuration
 //jsonConfigIni est une chaine json de configuration
 //Si les 2 sont utilisés, pour les éventuels paramètres présents 2x
@@ -50,9 +80,24 @@ const props = defineProps({
         return ''
       } 
     },
+    suitesauve: {
+      type: String,
+      default() {
+        return 'initdata'
+      }
+    },
 })
 const { codeConfigIni } = toRefs(props)
 const { jsonConfigIni } = toRefs(props)
+const { suitesauve } = toRefs(props)
+let suiteSauveDP = ref('init')
+if (suitesauve.value == 'init' || suitesauve.value == 'pagedata' || suitesauve.value == 'pageedit' || suitesauve.value == 'emitinit' || suitesauve.value == 'emitdocsinit') {
+  suiteSauveDP.value == 'init'  
+} else if (suitesauve.value == 'keep' || suitesauve.value == 'emitkeep' || suitesauve.value == 'emitdocskeep') {
+  suiteSauveDP.value == 'keep'  
+} else {
+  suiteSauveDP = ref('init')  
+}
 //console.log(codeConfigIni.value)
 let configIni = null
 //console.log(jsonConfigIni.value)
@@ -60,6 +105,7 @@ if (jsonConfigIni.value !== '') {
   configIni = JSON.parse(jsonConfigIni.value)
   //console.log(configIni)  
 }
+console.log(`DataInitialLoad: prm suitesauve: ${suitesauve.value}`)
 
 const lesDatasIni = ref(
   {
@@ -130,16 +176,43 @@ if (configIni !== null) {
 }
 //console.log(lesDatasIni.value)
 
+const docsResponseData = []
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
   //const oDocument = JSON.parse(jsonData)
   const success = responseData.success
   if (success) {
     const idDocument = responseData.iddocument
-    //document.location.href = "https://mygolux.lausanne.ch/goeland/document/document_data.php?iddocument="+idDocument
+    switch (suitesauve.value) {
+      case "pagedata":
+        document.location.href = "/goeland/document/document_data.php?iddocument="+idDocument
+        break      
+      case "pageedit":
+        document.location.href = "/goeland/document/document_edition_cligli.php?iddocument="+idDocument
+        break
+      case "emitinit":
+      case "emitkeep":
+        emit('postDocument', responseData)
+        break
+      case "emitdocsinit":
+      case "emitdocskeep":
+        const docReponseData = {
+          iddocument: responseData.iddocument,
+          titre: responseData.titre,
+          taille: responseData.taille,
+          md5: responseData.md5,
+          message: responseData.message,
+        }
+        docsResponseData.push(docReponseData)
+        break      
+    }
   } else {
     bSnackbar.value = true
     message.value = responseData.message 
   }
+}
+
+const emitdocs = () => {
+  emit('postDocument', docsResponseData)
 }
 </script>
