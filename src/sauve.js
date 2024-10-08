@@ -1,5 +1,5 @@
-import { data } from '@/stores/data.js'
-import { documentListeParMD5, uploadFile } from '@/axioscalls.js'
+import { data } from './stores/data.js'
+import { documentListeParMD5, uploadFile } from './axioscalls.js'
 
 export const verifieNouveauMD5 = async () => {
     const lesDatas = data()

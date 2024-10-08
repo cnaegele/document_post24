@@ -3,7 +3,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as directives from 'vuetify/directives'
-import { data } from '@/stores/data.js'
+import { data } from '../stores/data.js'
 import {getTheme} from '../../../cnlib/vgotheme.js' 
 
 const goelandTheme = getTheme('goeland')
