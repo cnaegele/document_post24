@@ -4,7 +4,7 @@
   <v-app>
     <v-main>
       <AppToper />
-      <DataInitialLoad 
+      <DPDataInitialLoad 
         :codeConfigIni="configurationInitialData"
         :jsonConfigIni="jsonParams"
         :suitesauve="suitesauveParams"
@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import DataInitialLoad from './components/DataInitialLoad.vue';
+import DPDataInitialLoad from './components/DPDataInitialLoad.vue';
 
 const urlParams = new URLSearchParams(window.location.search)
 const configurationInitialData = ref('')

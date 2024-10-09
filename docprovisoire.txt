@@ -36,6 +36,11 @@ objetslies			array			[]
 identifiant (numérique) du (des) objet(s) lié(s) au document. Initialise la liste des objets liés qui peut être modifiée avec l'interface
 
 
+idniveauconfidentialite	string		'1'	note3
+
+niveau de confidentialité
+
+
 sizemax			number			10000000 
 Taille (en octets) maximum du fichier que l'interface acceptera de traiter (défaut 10 Mo)
 Pas plus de 200 Mo sinon il y a blocage au niveau du serveur ( php: upload_max_filesize 222 M)
@@ -61,25 +66,85 @@ postDocument 	string json
 }
 
 
-Exemple simple d'utilisation :
+Exemples simples d'utilisation :
+
+//Avec valeurs par défaut:
 <template>
-  <Suspense>
-  <DocumentPost
-      libelle="'Indexation d'un procès-verbal'"
-      titre="'Procès-verbal du'"
-      famillestypes="'[{id: 18,label: 'Procès verbal, notes de séance',value: '18',type: [{id: 15,label: 'pdf', value: '15',}]}]'"
-      @postDocument="receptionDocumentPost"
-  ></DocumentPost>
-  </Suspense>
+  <v-app>
+    <v-main>
+      <p>Test documentpost</p>
+      <Suspense>
+        <DocumentPost></DocumentPost>
+      </Suspense>
+     </v-main>
+  </v-app>
 </template>
 
 <script setup>
-import EmployeChoix from '----------/document_post24/src/components/DocumentPost.vue'
+import DocumentPost from '../../document_post24/src/components/DocumentPost.vue'
+</script>
 
+
+//Avec quelques paramètres du composant
+<template>
+  <v-app>
+    <v-main>
+      <p>Test documentpost</p>
+      <Suspense>
+        <DocumentPost
+          libelle="Indexation d'un PV de séance"
+          titre="PV du"
+          :famillestypes="[
+            {
+              id: 18,
+              label: 'Procès verbal, notes de séance',
+              value: '18',
+              type: [
+                {
+                  id: 15,
+                  label: 'pdf',
+                  value: '15',
+                },
+                {
+                  id: 21,
+                  label: 'docx',
+                  value: '21',
+                },
+                {
+                  id: 27,
+                  label: 'odt',
+                  value: '27',
+                },
+                {
+                  id: 18,
+                  label: 'txt',
+                  value: '18',
+                },
+              ],
+            }            
+          ]"
+          idniveauconfidentialite="3"
+          @postDocument="receptionDocumentPost"
+        ></DocumentPost>
+      </Suspense>
+    </v-main>
+  </v-app>
+</template>
+
+<script setup>
+import DocumentPost from '../../document_post24/src/components/DocumentPost.vue'
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
 }
 </script>
+
+ça à l'air cool...
+Mais déception, ça ne l'est pas pour le moment (09.10.2024) car de la façon dont j'ai utilisé pinia, et ainsi que le petit utilitaire permettant de choisir le contexte vuetify (stocké dans pinia) impose un vuetify.js et un main.js particulier.
+Du coup, ce composant peut-il encore être considéré comme un composant.
+Je détaille le problème plus loin et il faudra voir pour modifier ça...
+
+
+
 
 
 note1: famillestypes par défaut
@@ -168,4 +233,14 @@ note1: famillestypes par défaut
 note2: auteuremploye / auteursacteur
 Si un document a un auteur employé, c'est un document interne, si il a un (des) auteurs acteur, c'est un document externe
 Il ne peut y avoir qu'un seul auteur employé, mais il peut y avoir plusieurs auteurs acteur
-Si on passe au composant les 2 propriétés auteuremploye et auteursacteur et que auteuremploye n'est pas égal à '', la propriété auteursacteur sera ignorée	  
+Si on passe au composant les 2 propriétés auteuremploye et auteursacteur et que auteuremploye n'est pas égal à '', la propriété auteursacteur sera ignorée
+
+note3: niveau de confidentialité
+IdNivConf	NivConf
+0	Document public
+1	Interne Ville de Lausanne
+2	Limité aux employes de la direction				Possibilité de choix employés et unités organisationnelles en plus
+3	Limité aux employés du service					Possibilité de choix employés et unités organisationnelles en plus
+4	Limité aux employés de l'unité organisationnelle		Possibilité de choix employés et unités organisationnelles en plus
+5	Limité au(x) groupe(s) de sécurité autorisé(s)		Choix des groupes de sécurité et possibilité de choix employés et unités organisationnelles en plus
+6	Limité aux employés autorisés					Choix employés et unités organisationnelles en plus
