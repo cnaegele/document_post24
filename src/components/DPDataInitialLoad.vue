@@ -51,7 +51,7 @@
     right
     @click="emitdocs()"
   >
-    Indexation terminée {{ suitesauve }}
+    Indexation terminée
   </v-btn> 
 
 </template>
