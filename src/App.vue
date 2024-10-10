@@ -39,6 +39,6 @@ if (urlParams.has('suitesauve')) {
   suitesauveParams.value = urlParams.get('suitesauve')
 }
 const receptionDocumentPost = (responseData) => {
-  console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
+  console.log(`receptionDocumentPost suite emit DPDataInitialLoad ${JSON.stringify(responseData)}`)
 }
 </script>

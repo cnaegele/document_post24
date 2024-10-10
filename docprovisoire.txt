@@ -15,6 +15,21 @@ Contenu initial du champ Titre
 
 famillestypes		array			voir sous note1 la valeur par défaut
 
+Liste des familles et des types par famille disponible dans les liste de choix Famille et Type
+
+
+familletitre		string			'apres'
+
+Défini si le libelle de la famille se met (modification automatique du champ Titre) dans le titre lors du choix de la famille
+'apres' : à la fin du titre
+'avant' : au début du titre
+'' ou n'importe quoi d'autre, pas de reprise du libelle de la famille
+
+
+nomfichiertitre		string			'non'
+
+Si à 'oui', lors de la selection du fichier à indexer, le nom du fichier, sans l'extension, est saisi automatiquement dans le champ titre
+
 
 sujet			string			''
 
@@ -165,7 +180,8 @@ jsonConfigIni		string			''
 chaine JSON qui défini des proriétes à passer à DocumentPost
 Si une propriété est définie dans le fichier de configuration (défini par codeConfigIni) et dans jsonConfigIni, c'est jsonConfigIni qui est pris en compte
 
-suitesauve		string			'initdata'
+suitesauve		string			'pagedata'
+
 Défini les actions après le POST du document.
 Au niveau du composant DocumentPost, définira suitesauve à 'init' ou 'keep'
 Défini les comportement suivant:
@@ -173,8 +189,13 @@ Défini les comportement suivant:
  - Ouverture de la page document_edit
  - Transmission de l'évènement pour le document
  - Transmission de l'évènement pour plusieurs documents (affiche bouton [Indexation terminée] )
-
-
+Valeurs possibles :
+pagedata			passe à DocumentPost suitesauve : 'init', ouvre la fiche de consutation du document après indexation, pas d'évènement émis
+pageedit			passe à DocumentPost suitesauve : 'init', ouvre la fiche d'édition du document après indexation, pas d'évènement émis
+emitinit			passe à DocumentPost suitesauve : 'init', émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitkeep			passe à DocumentPost suitesauve : 'keep', émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitdocsinit		passe à DocumentPost suitesauve : 'init',  affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitdocskeep		passe à DocumentPost suitesauve : 'keep', affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
 
 note1: famillestypes par défaut
 [

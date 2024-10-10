@@ -618,6 +618,8 @@ const { libelle } = toRefs(props)
 const { titre } = toRefs(props)
 lesDatas.document.titre = titre.value
 const { famillestypes } = toRefs(props)
+const { familletitre } = toRefs(props)
+const { nomfichiertitre } = toRefs(props)
 const { sujet } = toRefs(props)
 lesDatas.document.sujet = sujet.value
 //auteuremploye, traitement special dans onmounted pour récupérer pour l'affichage le nom selon le id
@@ -631,7 +633,7 @@ lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
 lesDatas.document.sizemax = sizemax
 const { suitesauve } = toRefs(props) //init ou keep
-console.log(`DocumentPost: prm suitesauve: ${suitesauve.value}`)
+//console.log(`DocumentPost: prm suitesauve: ${suitesauve.value}`)
 
 
 const itemsFamille = ref([])
@@ -792,6 +794,39 @@ watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
             lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
        }    
     }
+
+    //Selon configuration familletitre "avant" ou "apres" on modifie le titre du document
+    if (familletitre.value !== '') {
+        let newFamille = '', oldFamille = ''
+        let oFT
+        let leTitre = lesDatas.document.titre
+        if (newValueF !== '') {
+            oFT = famillestypes.value.find(item => item.value === newValueF)
+            newFamille = oFT ? oFT.label : ''
+        }
+        if (oldValueF !== '') {
+            oFT = famillestypes.value.find(item => item.value === oldValueF)
+            oldFamille = oFT ? oFT.label : ''
+        }
+        if (familletitre.value == 'apres') {
+            if (!leTitre.trim().endsWith(newFamille)) {
+                if (leTitre.trim().endsWith(oldFamille) && oldFamille !== '') {
+                    lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
+                } else {
+                    lesDatas.document.titre = `${leTitre} - ${newFamille}`    
+                }
+            }
+        } else if (familletitre.value == 'avant') {
+            if (!leTitre.trim().startsWith(newFamille)) {
+                if (leTitre.trim().startsWith(oldFamille) && oldFamille !== '') {
+                    lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
+                } else {
+                    lesDatas.document.titre = `${newFamille} - `    
+               }
+
+            }
+        }
+    }
 })
 
 watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
@@ -838,9 +873,19 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
        }    
     }
 
-    if(newValueFile !== undefined) {
+    if (newValueFile !== undefined) {
          //On vérifie que le fichier n'a pas déjà été indexé sur goéland
-         verifieNouveauMD5()       
+         verifieNouveauMD5()
+         
+        //Selon configuration nomfichiertitre à "oui" on met le nom du fichier (sans extension) comme titre du document
+        if (nomfichiertitre.value == 'oui') {
+            const posi = newValueFile.name.lastIndexOf('.')
+            if (posi !== -1) {
+                lesDatas.document.titre = newValueFile.name.substr(0, posi)
+            } else {
+                lesDatas.document.titre = newValueFile.name           
+            }
+        }
     }
 })
 

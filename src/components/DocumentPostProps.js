@@ -96,6 +96,18 @@ export const documentPostProps = {
         ]
       }
     },
+    familletitre: {
+      type: String,
+      default() {
+        return 'non'
+      } 
+    },
+    nomfichiertitre: {
+      type: String,
+      default() {
+        return 'non'
+      } 
+    },
     sujet: {
       type: String,
       default() {
@@ -223,7 +235,8 @@ export const documentPostProps = {
               ],
             },
           ],
-      
+      familletitre: 'apres',
+      nomfichiertitre: '',
       sujet: '',
       sizemax: 10000000,  
   }

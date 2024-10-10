@@ -30,6 +30,8 @@
       :libelle="lesDatasIni.libelle"
       :titre="lesDatasIni.titre"
       :famillestypes="lesDatasIni.famillestypes"
+      :familletitre="lesDatasIni.familletitre"
+      :nomfichiertitre="lesDatasIni.nomfichiertitre"
       :sujet="lesDatasIni.sujet"
       :auteuremploye="lesDatasIni.auteuremploye"
       :auteursacteur="lesDatasIni.auteursacteur"
@@ -85,7 +87,7 @@ const props = defineProps({
     suitesauve: {
       type: String,
       default() {
-        return 'initdata'
+        return 'pagedata'
       }
     },
 })
@@ -93,27 +95,30 @@ const { codeConfigIni } = toRefs(props)
 const { jsonConfigIni } = toRefs(props)
 const { suitesauve } = toRefs(props)
 let suiteSauveDP = ref('init')
-if (suitesauve.value == 'init' || suitesauve.value == 'pagedata' || suitesauve.value == 'pageedit' || suitesauve.value == 'emitinit' || suitesauve.value == 'emitdocsinit') {
-  suiteSauveDP.value == 'init'  
+if (suitesauve.value == 'pagedata' || suitesauve.value == 'pageedit' || suitesauve.value == 'emitinit' || suitesauve.value == 'emitdocsinit') {
+  suiteSauveDP.value == 'init' 
 } else if (suitesauve.value == 'keep' || suitesauve.value == 'emitkeep' || suitesauve.value == 'emitdocskeep') {
-  suiteSauveDP.value == 'keep'  
+  suiteSauveDP.value = 'keep'
 } else {
-  suiteSauveDP = ref('init')  
+  suiteSauveDP.value = 'init' 
 }
 //console.log(codeConfigIni.value)
+//console.log(`suitesauve initial: ${suitesauve.value} // suitesauve docpost: ${suiteSauveDP.value}`)
 let configIni = null
 //console.log(jsonConfigIni.value)
 if (jsonConfigIni.value !== '') {
   configIni = JSON.parse(jsonConfigIni.value)
   //console.log(configIni)  
 }
-console.log(`DataInitialLoad: prm suitesauve: ${suitesauve.value}`)
+//console.log(`DataInitialLoad: prm suitesauve: ${suitesauve.value}`)
 
 const lesDatasIni = ref(
   {
     libelle: '',
     titre:  '',
     famillestypes: [],
+    familletitre: 'non',
+    nomfichiertitre: 'non',
     sujet:  '',
     auteuremploye: '', // exemple: 7
     auteursacteur: [], // exemple: [10000,10001]  
@@ -136,6 +141,12 @@ if (propsIni.hasOwnProperty("titre")) {
 }
 if (propsIni.hasOwnProperty("famillestypes")) {
     lesDatasIni.value.famillestypes = propsIni.famillestypes
+}
+if (propsIni.hasOwnProperty("familletitre")) {
+    lesDatasIni.value.familletitre = propsIni.familletitre
+}
+if (propsIni.hasOwnProperty("nomfichiertitre")) {
+    lesDatasIni.value.nomfichiertitre = propsIni.nomfichiertitre
 }
 if (propsIni.hasOwnProperty("sujet")) {
     lesDatasIni.value.sujet = propsIni.sujet
@@ -194,7 +205,17 @@ const receptionDocumentPost = (responseData) => {
         break
       case "emitinit":
       case "emitkeep":
-        emit('postDocument', responseData)
+      const rReponseData = { 
+          succes: responseData.success,
+          documents: [{
+            iddocument: responseData.iddocument,
+            titre: responseData.titre,
+            taille: responseData.taille,
+            md5: responseData.md5,
+            message: responseData.message,
+          }]
+        }
+        emit('postDocument', rReponseData)
         break
       case "emitdocsinit":
       case "emitdocskeep":
@@ -210,11 +231,16 @@ const receptionDocumentPost = (responseData) => {
     }
   } else {
     bSnackbar.value = true
-    message.value = responseData.message 
+    message.value = responseData.message
+    emit('postDocument', responseData) 
   }
 }
 
 const emitdocs = () => {
-  emit('postDocument', docsResponseData)
+  emit('postDocument', {
+      success: true,
+      documents: docsResponseData
+    }
+  )
 }
 </script>
