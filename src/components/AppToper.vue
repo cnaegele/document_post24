@@ -22,7 +22,5 @@
 </template>
 
 <script setup>
-import { data } from '@/stores/data.js'
-import { demandeSauveData } from '@/sauve.js'
-const lesDatas = data()
+
 </script>

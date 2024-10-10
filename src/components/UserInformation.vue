@@ -20,7 +20,7 @@
 </template>
 <script setup>
     import { ref } from 'vue'
-    import { data } from '@/stores/data.js'
+    import { data } from '../stores/data.js'
     import { getDataUserInfo } from  '../../../cnlib/cnlib_axioscalls.js'
     import { useTheme } from 'vuetify'
     

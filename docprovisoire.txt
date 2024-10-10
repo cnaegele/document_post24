@@ -1,5 +1,5 @@
 Composant DocumentPost
---------------------------------
+------------------------------------
 
 Props
 
@@ -144,6 +144,35 @@ Du coup, ce composant peut-il encore être considéré comme un composant.
 Je détaille le problème plus loin et il faudra voir pour modifier ça...
 
 
+Ce composant, même sans ses défauts actuel expliqué ci-dessus, il ne me suffit pas.
+C'est pas du tout pratique de devoir faire une page pour chaque configuration différente, de modifier le code et compiler si il faut modifier les familles disponibles.
+Il faut aussi pouvoir gérer des paramètres dynamiques (par exemple, si au moment de l'indexation du document, on veut reprendre des objets liés venant du contexte d'utilisation)
+J'ai pensé que cette gestions de paramètres ne devait pas se trouver dans le composant DocumentPost.
+Il y a donc un composant qui appelle DocumentPost en lui passant dynamiquement des paramètres
+
+Composant DPDataInitialLoad (DP comme DocumentPost)
+-----------------------------------------
+
+Props
+
+codeConfigIni		string			''
+
+permet de charger un fichier json de configuration se trouvant sur le serveur (backend) qui défini des proriétes à passer à DocumentPost
+.......explications.......
+
+jsonConfigIni		string			''
+
+chaine JSON qui défini des proriétes à passer à DocumentPost
+Si une propriété est définie dans le fichier de configuration (défini par codeConfigIni) et dans jsonConfigIni, c'est jsonConfigIni qui est pris en compte
+
+suitesauve		string			'initdata'
+Défini les actions après le POST du document.
+Au niveau du composant DocumentPost, définira suitesauve à 'init' ou 'keep'
+Défini les comportement suivant:
+ - Ouverture de la page document_data
+ - Ouverture de la page document_edit
+ - Transmission de l'évènement pour le document
+ - Transmission de l'évènement pour plusieurs documents (affiche bouton [Indexation terminée] )
 
 
 
