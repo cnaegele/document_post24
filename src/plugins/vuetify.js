@@ -3,18 +3,18 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as directives from 'vuetify/directives'
-import { data } from '../stores/data.js'
-import { getTheme } from '../../../cnlib/vgotheme.js' 
+import { storevtfytheme } from '@/cnlib/stores/vtfytheme.js'
+import { getTheme } from '@/cnlib/vgotheme.js' 
 
 const goelandTheme = getTheme('goeland')
 
 export default {
   install: (app) => {
-    const lesDatas = data()
+    const vtfytheme = storevtfytheme()
     const vuetify = createVuetify({
       directives,
       theme: {
-        defaultTheme: lesDatas.env.themeChoisi,
+        defaultTheme: vtfytheme.themeChoisi,
         themes: {
           goelandTheme,
         },

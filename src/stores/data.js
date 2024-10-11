@@ -1,20 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue'
-export const data = defineStore({
+export const storedatadoc = defineStore({
     id: 'iddata',
     state: () => ({
         env: {
-            version: ref('1.0.0'),
-            dateversion: ref('08.10.2024'),
-            themeChoisi: ref(localStorage.getItem('themeChoisi') || 'dark'),
-        },
-        user: {
-            idEmployeUser: ref(0),
-            nomEmployeUser: ref(''),
-            prenomEmployeUser: ref(''),
-            loginEmployeUser: ref(''),
-            groupeSecurite: ref(''),
-            bInGroupe: ref(0),
+            version: ref('1.0.1'),
+            dateversion: ref('11.10.2024'),
         },
         file: ref(null),
         document: {

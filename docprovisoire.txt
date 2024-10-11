@@ -197,6 +197,8 @@ emitkeep			passe à DocumentPost suitesauve : 'keep', émet l'évènement postDocume
 emitdocsinit		passe à DocumentPost suitesauve : 'init',  affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
 emitdocskeep		passe à DocumentPost suitesauve : 'keep', affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
 
+
+************************************************************************************************
 note1: famillestypes par défaut
 [
           {

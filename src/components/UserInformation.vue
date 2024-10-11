@@ -1,7 +1,7 @@
 <template>
 <v-row no-gutters class="d-flex align-center">
     <v-col cols="auto">
-    Utilisateur : {{ lesDatas.user.prenomEmployeUser }} {{ lesDatas.user.nomEmployeUser }} / {{ lesDatas.user.loginEmployeUser }}
+    Utilisateur : {{ user.prenomEmployeUser }} {{ user.nomEmployeUser }} / {{ user.loginEmployeUser }}
     </v-col>
     <v-col cols="auto">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</v-col>
     <v-col cols="auto">thème :&nbsp;</v-col>
@@ -20,8 +20,9 @@
 </template>
 <script setup>
     import { ref } from 'vue'
-    import { data } from '../stores/data.js'
-    import { getDataUserInfo } from  '../../../cnlib/cnlib_axioscalls.js'
+    import { storevtfytheme } from '@/cnlib/stores/vtfytheme.js'
+    import { storeuser } from '../stores/user.js'
+    import { getDataUserInfo } from  '@/cnlib/cnlib_axioscalls.js'
     import { useTheme } from 'vuetify'
     
     const props = defineProps({
@@ -30,14 +31,15 @@
             required: false
         }
     })
-    const lesDatas = data()
-    getDataUserInfo(props.groupeSecurite, lesDatas)
+    const vtfytheme = storevtfytheme()
+    const user = storeuser()
+    getDataUserInfo(props.groupeSecurite, user)
     let themeAffiche
-    if (lesDatas.env.themeChoisi == 'dark') {
+    if (vtfytheme.themeChoisi == 'dark') {
         themeAffiche = ref('foncé')    
-    } else if (lesDatas.env.themeChoisi == 'light') {
+    } else if (vtfytheme.themeChoisi == 'light') {
         themeAffiche = ref('clair')   
-    } else if (lesDatas.env.themeChoisi == 'goelandTheme') {
+    } else if (vtfytheme.themeChoisi == 'goelandTheme') {
         themeAffiche = ref('goéland')   
     } else {
         themeAffiche = ref('foncé')   
@@ -46,19 +48,19 @@
 
     function choixTheme(value) {
         if (value == 'foncé') {
-            lesDatas.env.themeChoisi = 'dark'
+            vtfytheme.themeChoisi = 'dark'
             theme.global.name.value = 'dark'
             localStorage.setItem('themeChoisi', 'dark')
         } else if (value == 'clair') {
-            lesDatas.env.themeChoisi = 'light'    
+            vtfytheme.themeChoisi = 'light'    
             theme.global.name.value = 'light'
             localStorage.setItem('themeChoisi', 'light')
         } else if (value == 'goéland') {
-            lesDatas.env.themeChoisi = 'goelandTheme'    
+            vtfytheme.themeChoisi = 'goelandTheme'    
             theme.global.name.value = 'goelandTheme'
             localStorage.setItem('themeChoisi', 'goelandTheme')
         } else {
-            lesDatas.env.themeChoisi = 'dark'    
+            vtfytheme.themeChoisi = 'dark'    
             theme.global.name.value = 'dark'
             localStorage.setItem('themeChoisi', 'dark')
         }

@@ -598,21 +598,23 @@
   
 <script setup>
 import { ref, onMounted, toRefs, watch } from 'vue'
-import { data } from '../stores/data.js'
+import { storeuser } from '../stores/user.js'
+import { storedatadoc } from '../stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
 import { verifieNouveauMD5, demandeSauveData } from '../sauve.js'
 import { objetInfoParId, employeInfoParId, acteurInfoParId } from '../axioscalls.js'
-import EmployeChoix from '../../../employechoix/src/components/EmployeChoix.vue'
-import ActeurChoix from '../../../acteurchoix/src/components/ActeurChoix.vue'
-import UniteOrgChoix from '../../../uniteorgchoix/src/components/UniteOrgChoix.vue';
-import GroupeSecuriteChoix from '../../../groupesecuritechoix/src/components/GroupeSecuriteChoix.vue';
+import EmployeChoix from '@/components/EmployeChoix.vue'
+import ActeurChoix from '@/components/ActeurChoix.vue'
+import UniteOrgChoix from '@/components/UniteOrgChoix.vue';
+import GroupeSecuriteChoix from '@/components/GroupeSecuriteChoix.vue';
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
     emit('postDocument', jsonDocument)
 }
-const lesDatas = data()
+const user = storeuser()
+const lesDatas = storedatadoc()
 const props = defineProps(documentPostProps)
 const { libelle } = toRefs(props)
 const { titre } = toRefs(props)
@@ -937,8 +939,8 @@ watch(() => lesDatas.document.acteurAuteur, () => {
 }, { deep: true })
 
 const auteurUser = () => {
-    lesDatas.document.idEmployeAuteur = lesDatas.user.idEmployeUser
-    txtEmployeAuteur.value = `${lesDatas.user.nomEmployeUser} ${lesDatas.user.prenomEmployeUser}`
+    lesDatas.document.idEmployeAuteur = user.idEmployeUser
+    txtEmployeAuteur.value = `${user.nomEmployeUser} ${user.prenomEmployeUser}`
 }
 const choixEmploye = () => {
     document.getElementById("btnActiveCardChoixEmploye").click() 

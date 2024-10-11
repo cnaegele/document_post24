@@ -14,8 +14,8 @@
   </template>
   
   <script setup>
-    import { data } from '@/stores/data.js'
-    const lesDatas = data()
+    import { storedatadoc } from '@/stores/data.js'
+    const lesDatas = storedatadoc()
     const version = lesDatas.env.version
     const dateversion = lesDatas.env.dateversion
   </script>

@@ -1,8 +1,9 @@
-import { data } from './stores/data.js'
+import { storedatadoc } from './stores/data.js'
+import { MD5, lib } from 'crypto-js'
 import { documentListeParMD5, uploadFile } from './axioscalls.js'
 
 export const verifieNouveauMD5 = async () => {
-    const lesDatas = data()
+    const lesDatas = storedatadoc()
     let strMD5 = ''
 
     if (!lesDatas.file) {
@@ -11,8 +12,8 @@ export const verifieNouveauMD5 = async () => {
 
     //Lecture du contenu pour calcul md5
     const fileContents = await readFileAsArrayBuffer(lesDatas.file)
-    const wordArray = CryptoJS.lib.WordArray.create(fileContents)
-    strMD5 = CryptoJS.MD5(wordArray).toString()
+    const wordArray =  lib.WordArray.create(fileContents)
+    strMD5 = MD5(wordArray).toString()
     //console.log(`md5: ${strMD5}`)    
     const docListe = await documentListeParMD5(strMD5)
     if (docListe.length > 0) {
@@ -28,7 +29,7 @@ export const verifieNouveauMD5 = async () => {
 }
 
 export const demandeSauveData = async () => {
-    const lesDatas = data()
+    const lesDatas = storedatadoc()
     let strMD5 = ''
 
     //Upload
