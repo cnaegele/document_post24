@@ -3,8 +3,8 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as directives from 'vuetify/directives'
-import { storevtfytheme } from '@/cnlib/stores/vtfytheme.js'
-import { getTheme } from '@/cnlib/vgotheme.js' 
+import { storevtfytheme } from '@/cnlibrary/stores/vtfytheme.js'
+import { getTheme } from '@/cnlibrary/vgotheme.js' 
 
 const goelandTheme = getTheme('goeland')
 

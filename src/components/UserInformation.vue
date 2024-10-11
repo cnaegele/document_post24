@@ -20,9 +20,9 @@
 </template>
 <script setup>
     import { ref } from 'vue'
-    import { storevtfytheme } from '@/cnlib/stores/vtfytheme.js'
+    import { storevtfytheme } from '@/cnlibrary/stores/vtfytheme.js'
     import { storeuser } from '../stores/user.js'
-    import { getDataUserInfo } from  '@/cnlib/cnlib_axioscalls.js'
+    import { getDataUserInfo } from  '@/cnlibrary/cnlib_axioscalls.js'
     import { useTheme } from 'vuetify'
     
     const props = defineProps({
