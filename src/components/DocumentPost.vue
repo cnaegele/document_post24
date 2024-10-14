@@ -598,11 +598,11 @@
   
 <script setup>
 import { ref, onMounted, toRefs, watch } from 'vue'
-import { storeuser } from '../stores/user.js'
-import { storedatadoc } from '../stores/data.js'
-import { documentPostProps } from './DocumentPostProps.js'
-import { getDicoNiveauConfidentialite } from '../axioscalls.js'
-import { verifieNouveauMD5, demandeSauveData } from '../sauve.js'
+import { storeuser } from '@/stores/user.js'
+import { storedatadoc } from '@/stores/data.js'
+import { documentPostProps } from '@/components/DocumentPostProps.js'
+import { getDicoNiveauConfidentialite } from '@/axioscalls.js'
+import { verifieNouveauMD5, demandeSauveData } from '@/sauve.js'
 import { objetInfoParId } from '@/axioscalls_objet.js'
 import { employeInfoParId } from '@/axioscalls_employe.js'
 import { acteurInfoParId } from '@/axioscalls_acteur.js'

@@ -60,7 +60,7 @@
 
 <script setup>
 import { ref, toRefs } from 'vue'
-import { documentPostPropsIni } from '../configurationini.js'
+import { documentPostPropsIni } from '@/configurationini.js'
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
@@ -206,7 +206,7 @@ const receptionDocumentPost = (responseData) => {
       case "emitinit":
       case "emitkeep":
       const rReponseData = { 
-          succes: responseData.success,
+          success: responseData.success,
           documents: [{
             iddocument: responseData.iddocument,
             titre: responseData.titre,

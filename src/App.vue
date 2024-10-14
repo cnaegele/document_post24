@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import DPDataInitialLoad from './components/DPDataInitialLoad.vue';
+import DPDataInitialLoad from '@/components/DPDataInitialLoad.vue';
 
 const urlParams = new URLSearchParams(window.location.search)
 const configurationInitialData = ref('')
@@ -41,7 +41,8 @@ if (urlParams.has('suitesauve')) {
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit DPDataInitialLoad ${JSON.stringify(responseData)}`)
   if (window.opener && typeof window.opener.receptionDocuments24 === 'function') {
-    window.opener.receptionDocuments24(jsonData)
+    window.opener.receptionDocuments24(JSON.stringify(responseData))
+    window.self.close();
   }
 }
 </script>
