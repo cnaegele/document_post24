@@ -141,12 +141,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { getDataUserInfo, 
-        getActeurData, 
+import { getActeurData, 
         getActeurDataAdresse, 
         getActeurDataComplement,
         getActeurDataActeurLie, 
-        getActeurDataRole } from '../axioscalls.js'
+        getActeurDataRole } from '@/axioscalls_acteur.js'
+import { getDataUserInfo,} from '@/axioscalls_user.js'
 const props = defineProps({
   acteurId: String,
 })

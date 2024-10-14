@@ -638,7 +638,7 @@
   
 <script setup>
 import { ref } from 'vue'
-import { getUnitesOrgListe } from '../axioscalls.js'
+import { getUnitesOrgListe } from '@/axioscalls_uniteorg.js'
 
 const props = defineProps({
   modeChoix: String,

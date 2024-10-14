@@ -5,7 +5,7 @@ Props
 
 libelle			string			''
 
-Première ligne du composant, pes de ligne si ''. Exemple: Indexation d'un document de la famille photo
+PremiÃ¨re ligne du composant, pes de ligne si ''. Exemple: Indexation d'un document de la famille photo
 
 
 titre				string			''
@@ -13,22 +13,22 @@ titre				string			''
 Contenu initial du champ Titre
 
 
-famillestypes		array			voir sous note1 la valeur par défaut
+famillestypes		array			voir sous note1 la valeur par dÃ©faut
 
 Liste des familles et des types par famille disponible dans les liste de choix Famille et Type
 
 
 familletitre		string			'apres'
 
-Défini si le libelle de la famille se met (modification automatique du champ Titre) dans le titre lors du choix de la famille
-'apres' : à la fin du titre
-'avant' : au début du titre
+DÃ©fini si le libelle de la famille se met (modification automatique du champ Titre) dans le titre lors du choix de la famille
+'apres' : Ã  la fin du titre
+'avant' : au dÃ©but du titre
 '' ou n'importe quoi d'autre, pas de reprise du libelle de la famille
 
 
 nomfichiertitre		string			'non'
 
-Si à 'oui', lors de la selection du fichier à indexer, le nom du fichier, sans l'extension, est saisi automatiquement dans le champ titre
+Si Ã  'oui', lors de la selection du fichier Ã  indexer, le nom du fichier, sans l'extension, est saisi automatiquement dans le champ titre
 
 
 sujet			string			''
@@ -43,28 +43,28 @@ identifiant (numerique) de l'employe auteur du document
 
 auteuracteur		array			[]	note2
 
-identifiant (numérique) du (des) acteur(s) auteur du document
+identifiant (numÃ©rique) du (des) acteur(s) auteur du document
 
 
 objetslies			array			[]	
 
-identifiant (numérique) du (des) objet(s) lié(s) au document. Initialise la liste des objets liés qui peut être modifiée avec l'interface
+identifiant (numÃ©rique) du (des) objet(s) liÃ©(s) au document. Initialise la liste des objets liÃ©s qui peut Ãªtre modifiÃ©e avec l'interface
 
 
 idniveauconfidentialite	string		'1'	note3
 
-niveau de confidentialité
+niveau de confidentialitÃ©
 
 
 sizemax			number			10000000 
-Taille (en octets) maximum du fichier que l'interface acceptera de traiter (défaut 10 Mo)
+Taille (en octets) maximum du fichier que l'interface acceptera de traiter (dÃ©faut 10 Mo)
 Pas plus de 200 Mo sinon il y a blocage au niveau du serveur ( php: upload_max_filesize 222 M)
 
 
 suitesauve		string			init
-Comportement du composant suite à la sauvegarde
-init : réinitialise tous les champs ave les valeurs par défaut
-keep : garde les valeurs saisies sauf le champ qui défini le fichier à indexer.
+Comportement du composant suite Ã  la sauvegarde
+init : rÃ©initialise tous les champs ave les valeurs par dÃ©faut
+keep : garde les valeurs saisies sauf le champ qui dÃ©fini le fichier Ã  indexer.
 
 
 Event
@@ -77,13 +77,13 @@ postDocument 	string json
 	titre: titre du document,
 	iddocument: nnnnnn,
 	taille: xxxxxx (en octet),
-	md5: chaine MD5 de 32 caractères,
+	md5: chaine MD5 de 32 caractÃ¨res,
 }
 
 
 Exemples simples d'utilisation :
 
-//Avec valeurs par défaut:
+//Avec valeurs par dÃ©faut:
 <template>
   <v-app>
     <v-main>
@@ -100,19 +100,19 @@ import DocumentPost from '../../document_post24/src/components/DocumentPost.vue'
 </script>
 
 
-//Avec quelques paramètres du composant
+//Avec quelques paramÃ¨tres du composant
 <template>
   <v-app>
     <v-main>
       <p>Test documentpost</p>
       <Suspense>
         <DocumentPost
-          libelle="Indexation d'un PV de séance"
+          libelle="Indexation d'un PV de sÃ©ance"
           titre="PV du"
           :famillestypes="[
             {
               id: 18,
-              label: 'Procès verbal, notes de séance',
+              label: 'ProcÃ¨s verbal, notes de sÃ©ance',
               value: '18',
               type: [
                 {
@@ -153,17 +153,17 @@ const receptionDocumentPost = (responseData) => {
 }
 </script>
 
-ça à l'air cool...
-Mais déception, ça ne l'est pas pour le moment (09.10.2024) car de la façon dont j'ai utilisé pinia, et ainsi que le petit utilitaire permettant de choisir le contexte vuetify (stocké dans pinia) impose un vuetify.js et un main.js particulier.
-Du coup, ce composant peut-il encore être considéré comme un composant.
-Je détaille le problème plus loin et il faudra voir pour modifier ça...
+Ã§a Ã  l'air cool...
+Mais dÃ©ception, Ã§a ne l'est pas pour le moment (09.10.2024) car de la faÃ§on dont j'ai utilisÃ© pinia, et ainsi que le petit utilitaire permettant de choisir le contexte vuetify (stockÃ© dans pinia) impose un vuetify.js et un main.js particulier.
+Du coup, ce composant peut-il encore Ãªtre considÃ©rÃ© comme un composant.
+Je dÃ©taille le problÃ¨me plus loin et il faudra voir pour modifier Ã§a...
 
 
-Ce composant, même sans ses défauts actuel expliqué ci-dessus, il ne me suffit pas.
-C'est pas du tout pratique de devoir faire une page pour chaque configuration différente, de modifier le code et compiler si il faut modifier les familles disponibles.
-Il faut aussi pouvoir gérer des paramètres dynamiques (par exemple, si au moment de l'indexation du document, on veut reprendre des objets liés venant du contexte d'utilisation)
-J'ai pensé que cette gestions de paramètres ne devait pas se trouver dans le composant DocumentPost.
-Il y a donc un composant qui appelle DocumentPost en lui passant dynamiquement des paramètres
+Ce composant, mÃªme sans ses dÃ©fauts actuel expliquÃ© ci-dessus, il ne me suffit pas.
+C'est pas du tout pratique de devoir faire une page pour chaque configuration diffÃ©rente, de modifier le code et compiler si il faut modifier les familles disponibles.
+Il faut aussi pouvoir gÃ©rer des paramÃ¨tres dynamiques (par exemple, si au moment de l'indexation du document, on veut reprendre des objets liÃ©s venant du contexte d'utilisation)
+J'ai pensÃ© que cette gestions de paramÃ¨tres ne devait pas se trouver dans le composant DocumentPost.
+Il y a donc un composant qui appelle DocumentPost en lui passant dynamiquement des paramÃ¨tres
 
 Composant DPDataInitialLoad (DP comme DocumentPost)
 -----------------------------------------
@@ -172,34 +172,34 @@ Props
 
 codeConfigIni		string			''
 
-permet de charger un fichier json de configuration se trouvant sur le serveur (backend) qui défini des proriétes à passer à DocumentPost
+permet de charger un fichier json de configuration se trouvant sur le serveur (backend) qui dÃ©fini des proriÃ©tes Ã  passer Ã  DocumentPost
 .......explications.......
 
 jsonConfigIni		string			''
 
-chaine JSON qui défini des proriétes à passer à DocumentPost
-Si une propriété est définie dans le fichier de configuration (défini par codeConfigIni) et dans jsonConfigIni, c'est jsonConfigIni qui est pris en compte
+chaine JSON qui dÃ©fini des proriÃ©tes Ã  passer Ã  DocumentPost
+Si une propriÃ©tÃ© est dÃ©finie dans le fichier de configuration (dÃ©fini par codeConfigIni) et dans jsonConfigIni, c'est jsonConfigIni qui est pris en compte
 
 suitesauve		string			'pagedata'
 
-Défini les actions après le POST du document.
-Au niveau du composant DocumentPost, définira suitesauve à 'init' ou 'keep'
-Défini les comportement suivant:
+DÃ©fini les actions aprÃ¨s le POST du document.
+Au niveau du composant DocumentPost, dÃ©finira suitesauve Ã  'init' ou 'keep'
+DÃ©fini les comportement suivant:
  - Ouverture de la page document_data
  - Ouverture de la page document_edit
- - Transmission de l'évènement pour le document
- - Transmission de l'évènement pour plusieurs documents (affiche bouton [Indexation terminée] )
+ - Transmission de l'Ã©vÃ¨nement pour le document
+ - Transmission de l'Ã©vÃ¨nement pour plusieurs documents (affiche bouton [Indexation terminÃ©e] )
 Valeurs possibles :
-pagedata			passe à DocumentPost suitesauve : 'init', ouvre la fiche de consutation du document après indexation, pas d'évènement émis
-pageedit			passe à DocumentPost suitesauve : 'init', ouvre la fiche d'édition du document après indexation, pas d'évènement émis
-emitinit			passe à DocumentPost suitesauve : 'init', émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
-emitkeep			passe à DocumentPost suitesauve : 'keep', émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
-emitdocsinit		passe à DocumentPost suitesauve : 'init',  affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
-emitdocskeep		passe à DocumentPost suitesauve : 'keep', affiche un bouton [indexation terminée], au clic sur le bouton, émet l'évènement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+pagedata			passe Ã  DocumentPost suitesauve : 'init', ouvre la fiche de consutation du document aprÃ¨s indexation, pas d'Ã©vÃ¨nement Ã©mis
+pageedit			passe Ã  DocumentPost suitesauve : 'init', ouvre la fiche d'Ã©dition du document aprÃ¨s indexation, pas d'Ã©vÃ¨nement Ã©mis
+emitinit			passe Ã  DocumentPost suitesauve : 'init', Ã©met l'Ã©vÃ¨nement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitkeep			passe Ã  DocumentPost suitesauve : 'keep', Ã©met l'Ã©vÃ¨nement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitdocsinit		passe Ã  DocumentPost suitesauve : 'init',  affiche un bouton [indexation terminÃ©e], au clic sur le bouton, Ã©met l'Ã©vÃ¨nement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
+emitdocskeep		passe Ã  DocumentPost suitesauve : 'keep', affiche un bouton [indexation terminÃ©e], au clic sur le bouton, Ã©met l'Ã©vÃ¨nement postDocument en passant un objet avec succes, documents[{iddocument, titre, taille, md5, message}]
 
 
 ************************************************************************************************
-note1: famillestypes par défaut
+note1: famillestypes par dÃ©faut
 [
           {
             id: 7,
@@ -254,7 +254,7 @@ note1: famillestypes par défaut
           },
           {
             id: 18,
-            label: 'Procès verbal, notes de séance',
+            label: 'ProcÃ¨s verbal, notes de sÃ©ance',
             value: '18',
             type: [
               {
@@ -283,16 +283,16 @@ note1: famillestypes par défaut
 
 	  
 note2: auteuremploye / auteursacteur
-Si un document a un auteur employé, c'est un document interne, si il a un (des) auteurs acteur, c'est un document externe
-Il ne peut y avoir qu'un seul auteur employé, mais il peut y avoir plusieurs auteurs acteur
-Si on passe au composant les 2 propriétés auteuremploye et auteursacteur et que auteuremploye n'est pas égal à '', la propriété auteursacteur sera ignorée
+Si un document a un auteur employÃ©, c'est un document interne, si il a un (des) auteurs acteur, c'est un document externe
+Il ne peut y avoir qu'un seul auteur employÃ©, mais il peut y avoir plusieurs auteurs acteur
+Si on passe au composant les 2 propriÃ©tÃ©s auteuremploye et auteursacteur et que auteuremploye n'est pas Ã©gal Ã  '', la propriÃ©tÃ© auteursacteur sera ignorÃ©e
 
-note3: niveau de confidentialité
+note3: niveau de confidentialitÃ©
 IdNivConf	NivConf
 0	Document public
 1	Interne Ville de Lausanne
-2	Limité aux employes de la direction				Possibilité de choix employés et unités organisationnelles en plus
-3	Limité aux employés du service					Possibilité de choix employés et unités organisationnelles en plus
-4	Limité aux employés de l'unité organisationnelle		Possibilité de choix employés et unités organisationnelles en plus
-5	Limité au(x) groupe(s) de sécurité autorisé(s)		Choix des groupes de sécurité et possibilité de choix employés et unités organisationnelles en plus
-6	Limité aux employés autorisés					Choix employés et unités organisationnelles en plus
+2	LimitÃ© aux employes de la direction				PossibilitÃ© de choix employÃ©s et unitÃ©s organisationnelles en plus
+3	LimitÃ© aux employÃ©s du service					PossibilitÃ© de choix employÃ©s et unitÃ©s organisationnelles en plus
+4	LimitÃ© aux employÃ©s de l'unitÃ© organisationnelle		PossibilitÃ© de choix employÃ©s et unitÃ©s organisationnelles en plus
+5	LimitÃ© au(x) groupe(s) de sÃ©curitÃ© autorisÃ©(s)		Choix des groupes de sÃ©curitÃ© et possibilitÃ© de choix employÃ©s et unitÃ©s organisationnelles en plus
+6	LimitÃ© aux employÃ©s autorisÃ©s					Choix employÃ©s et unitÃ©s organisationnelles en plus

@@ -22,5 +22,5 @@
 </template>
 
 <script setup>
-
+import UserInformation from '@/components/user/UserInformation.vue';
 </script>

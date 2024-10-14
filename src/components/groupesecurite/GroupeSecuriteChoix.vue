@@ -24,7 +24,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { getGroupesSecuriteListe } from '../axioscalls.js'
+import { getGroupesSecuriteListe } from '@/axioscalls_groupesecurite.js'
 
 const props = defineProps({
   modeChoix: String,

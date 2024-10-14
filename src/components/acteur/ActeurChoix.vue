@@ -159,8 +159,8 @@
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
-import { getActeursListe } from '../axioscalls.js'
-import ActeurData from '@/components/ActeurData.vue'
+import { getActeursListe } from '@/axioscalls_acteur.js'
+import ActeurData from '@/components/acteur/ActeurData.vue'
 
 const props = defineProps({
   critereTypeInit: String,

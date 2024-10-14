@@ -603,11 +603,13 @@ import { storedatadoc } from '../stores/data.js'
 import { documentPostProps } from './DocumentPostProps.js'
 import { getDicoNiveauConfidentialite } from '../axioscalls.js'
 import { verifieNouveauMD5, demandeSauveData } from '../sauve.js'
-import { objetInfoParId, employeInfoParId, acteurInfoParId } from '../axioscalls.js'
-import EmployeChoix from '@/components/EmployeChoix.vue'
-import ActeurChoix from '@/components/ActeurChoix.vue'
-import UniteOrgChoix from '@/components/UniteOrgChoix.vue';
-import GroupeSecuriteChoix from '@/components/GroupeSecuriteChoix.vue';
+import { objetInfoParId } from '@/axioscalls_objet.js'
+import { employeInfoParId } from '@/axioscalls_employe.js'
+import { acteurInfoParId } from '@/axioscalls_acteur.js'
+import EmployeChoix from '@/components/employe/EmployeChoix.vue'
+import ActeurChoix from '@/components/acteur/ActeurChoix.vue'
+import UniteOrgChoix from '@/components/uniteorg/UniteOrgChoix.vue';
+import GroupeSecuriteChoix from '@/components/groupesecurite/GroupeSecuriteChoix.vue';
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {

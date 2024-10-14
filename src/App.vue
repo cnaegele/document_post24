@@ -40,5 +40,8 @@ if (urlParams.has('suitesauve')) {
 }
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit DPDataInitialLoad ${JSON.stringify(responseData)}`)
+  if (window.opener && typeof window.opener.receptionDocuments24 === 'function') {
+    window.opener.receptionDocuments24(jsonData)
+  }
 }
 </script>

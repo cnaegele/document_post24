@@ -134,8 +134,8 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import UniteOrgChoix from '@/components/UniteOrgChoix.vue'
-import { getEmployesListe } from '../axioscalls.js'
+import UniteOrgChoix from '@/components/uniteorg/UniteOrgChoix.vue'
+import { getEmployesListe } from '@/axioscalls_employe'
 
 const props = defineProps({
   nombreMaximumRetour: {
