@@ -18,6 +18,13 @@ famillestypes		array			voir sous note1 la valeur par défaut
 Liste des familles et des types par famille disponible dans les liste de choix Famille et Type
 
 
+!!!!! A IMPLEMENTER !!!!!
+famillessujets  array     []
+
+Liste de sujets proposé dans un <select> selon la famille. 
+Si définition pour la famille id 0, est pris pour toute les famille non définie dans cette liste
+
+
 familletitre		string			'apres'
 
 Défini si le libelle de la famille se met (modification automatique du champ Titre) dans le titre lors du choix de la famille
@@ -56,6 +63,14 @@ idniveauconfidentialite	string		'1'	note3
 niveau de confidentialité
 
 
+!!!!! A IMPLEMENTER !!!!!
+droitconsultemploye       array     []
+droitconsultuniteorg      array     []
+droitconsultgroupesecu    array     []
+Liste des employés, unites organisationnelle, groupes de sécurité autorisés à consulter le document 
+si il y a confidentialité
+
+
 sizemax			number			10000000 
 Taille (en octets) maximum du fichier que l'interface acceptera de traiter (défaut 10 Mo)
 Pas plus de 200 Mo sinon il y a blocage au niveau du serveur ( php: upload_max_filesize 222 M)
@@ -76,6 +91,7 @@ postDocument 	string json
 	fileName: fileNameClient -> fileNameUnique (php upload) -> nomFichier (goeland repository),
 	titre: titre du document,
 	iddocument: nnnnnn,
+  dateofficielle: aaaa-mm-jj,
 	taille: xxxxxx (en octet),
 	md5: chaine MD5 de 32 caractères,
 }
