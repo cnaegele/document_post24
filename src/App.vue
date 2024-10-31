@@ -14,6 +14,20 @@
     </v-main>
   </v-app>
  </Suspense>
+
+ <v-container v-if="configurationInitialData == 'generic'">
+    <v-row>
+        <v-col>
+          <v-select
+            v-model="suitesauveParams"
+            label="Comportement suite sauvegarde"
+            :items="itemsSuiteSauve"
+            item-title="label"
+          ></v-select>
+        </v-col>
+    </v-row>
+  </v-container>
+  
 </template>
 
 
@@ -24,7 +38,14 @@ import DPDataInitialLoad from '@/components/DPDataInitialLoad.vue';
 const urlParams = new URLSearchParams(window.location.search)
 const configurationInitialData = ref('')
 const jsonParams = ref('')
-const suitesauveParams = ref('')
+const suitesauveParams = ref('emitinit')
+const itemsSuiteSauve = ref([
+  {label: `Réinitialisation des valeurs de champs après la sauvegarde`, value: 'emitinit'},
+  {label: `Conservation des valeurs de champs après la sauvegarde`, value: 'emitkeep'},
+  {label: `Ouvrir la page de consultation du document après la sauvegarde`, value: 'pagedata'},
+  {label: `Ouvrir la page d'édition' du document après la sauvegarde`, value: 'pageedit'},
+])
+
 
 if (urlParams.has('configini')) {
   configurationInitialData.value = urlParams.get('configini')

@@ -42,7 +42,7 @@
       @postDocument="receptionDocumentPost"
   ></DocumentPost>
   </Suspense>
-
+  
   <v-btn
     v-if="suitesauve == 'emitdocsinit' || suitesauve == 'emitdocskeep'"
     class="floating-btn"
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue'
+import { ref, toRefs, watch } from 'vue'
 import { documentPostPropsIni } from '@/configurationini.js'
 
 const emit = defineEmits(['postDocument'])
@@ -94,23 +94,29 @@ const props = defineProps({
 const { codeConfigIni } = toRefs(props)
 const { jsonConfigIni } = toRefs(props)
 const { suitesauve } = toRefs(props)
-let suiteSauveDP = ref('init')
-if (suitesauve.value == 'pagedata' || suitesauve.value == 'pageedit' || suitesauve.value == 'emitinit' || suitesauve.value == 'emitdocsinit') {
-  suiteSauveDP.value == 'init' 
-} else if (suitesauve.value == 'keep' || suitesauve.value == 'emitkeep' || suitesauve.value == 'emitdocskeep') {
-  suiteSauveDP.value = 'keep'
-} else {
-  suiteSauveDP.value = 'init' 
+
+const determineSuiteSauveDP = (suitesauve) => {
+  let suiteSauveDP = 'init'
+  if (suitesauve == 'pagedata' || suitesauve == 'pageedit' || suitesauve == 'emitinit' || suitesauve == 'emitdocsinit') {
+    suiteSauveDP == 'init' 
+  } else if (suitesauve == 'keep' || suitesauve == 'emitkeep' || suitesauve == 'emitdocskeep') {
+    suiteSauveDP = 'keep'
+  } else {
+    suiteSauveDP = 'init' 
+  }
+  //console.log(`suitesauve initial: ${suitesauve} // suitesauve docpost: ${suiteSauveDP}`)  
+  return suiteSauveDP 
 }
+
+const suiteSauveDP = ref('init')
+suiteSauveDP.value = determineSuiteSauveDP(suitesauve.value)
 //console.log(codeConfigIni.value)
-//console.log(`suitesauve initial: ${suitesauve.value} // suitesauve docpost: ${suiteSauveDP.value}`)
 let configIni = null
 //console.log(jsonConfigIni.value)
 if (jsonConfigIni.value !== '') {
   configIni = JSON.parse(jsonConfigIni.value)
   //console.log(configIni)  
 }
-//console.log(`DataInitialLoad: prm suitesauve: ${suitesauve.value}`)
 
 const lesDatasIni = ref(
   {
@@ -188,6 +194,10 @@ if (configIni !== null) {
   //qui est le encodeURIComponent de: {"titre":"Gare 22 - ","sujet":"#444","auteursacteur":[10000],"objetslies":[1000,10000]}
 }
 //console.log(lesDatasIni.value)
+
+watch(() => props.suitesauve, (newVal, oldVal) => {
+  suiteSauveDP.value = determineSuiteSauveDP(newVal)
+})
 
 const docsResponseData = []
 const receptionDocumentPost = (responseData) => {
