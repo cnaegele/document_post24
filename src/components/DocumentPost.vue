@@ -57,13 +57,19 @@
       <v-col cols="12" md="2" class="titreChampSaisie">Famille</v-col>
         <v-col cols="12" md="3">
             <v-select
-                v-model="lesDatas.document.idFamille"
+                v-model="oFamille"  
                 :items="itemsFamille"
                 item-title="label"
-                :reduce="(item) => itemsFamille.value"
+                item-value="value"
                 :rules="familleRules"
                 placeholder="Sélection de la famille"
-            ></v-select>                     
+                return-object
+            >
+            <!-- Affichage de la valeur sélectionnée -->
+            <template v-slot:selection="{ item }">
+                {{ item.title }}
+            </template>
+            </v-select>                     
         </v-col>
         <v-col cols="12" md="1"></v-col>
         <v-col cols="12" md="1" class="titreChampSaisie">Type</v-col>
@@ -642,6 +648,7 @@ const { suitesauve } = toRefs(props) //init ou keep
 
 const itemsFamille = ref([])
 const itemsType = ref([])
+const oFamille = ref(null)
 let itemF
 for (let i=0; i<famillestypes.value.length; i++) {
     itemF = {
@@ -653,6 +660,7 @@ for (let i=0; i<famillestypes.value.length; i++) {
 }
 //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
 if (itemsFamille.value.length == 1) {
+    oFamille.value = itemsFamille.value[0]
     lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
     itemsType.value = []
     let itemT
@@ -760,7 +768,24 @@ watch(() => lesDatas.document.dateOfficielle, () => {
     }
 })
 
-watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
+watch(() => oFamille.value, (newValueoF, oldValueoF) => {
+    console.log(oFamille.value)
+    //Le v-select a "return-object" et v-model="oFamille"
+    //et il sert à définir la famille du document (lesDatas.document.idFamille)
+    //Pourquoi tout ce binz pour retourner l'objet :
+    //Parce que on veut pouvoir avoir le même idFamille pour plusieurs options
+    // value: 11 label: Plan
+    // value: 11 label: Plan exécutoire
+    // value: 11 label: Plan de révision
+    //Ce qui permet d'utiliser le label pour l'aide à la saisie du titre du document 
+    //avec différent choix pour la seule famille plan
+    //Si on ne fait pas ça, la selection de n'importe quelle option value 11 affiche la première option valuse 11 (Plan)
+    const newValueF = newValueoF.value
+    let oldValueF = null
+    if (oldValueoF !== null) {
+        oldValueF = oldValueoF.value    
+    }
+    lesDatas.document.idFamille = newValueF
     itemsType.value = []
     let itemT
     for (let i=0; i<famillestypes.value.length; i++) {
@@ -804,12 +829,13 @@ watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
         let newFamille = '', oldFamille = ''
         let oFT
         let leTitre = lesDatas.document.titre
+        
         if (newValueF !== '') {
-            oFT = famillestypes.value.find(item => item.value === newValueF)
+            oFT = famillestypes.value.find(item => item.id === newValueoF.id)
             newFamille = oFT ? oFT.label : ''
         }
-        if (oldValueF !== '') {
-            oFT = famillestypes.value.find(item => item.value === oldValueF)
+        if (oldValueF !== '' && oldValueF !== null) {
+            oFT = famillestypes.value.find(item => item.id === oldValueoF.id)
             oldFamille = oFT ? oFT.label : ''
         }
         if (familletitre.value == 'apres') {
@@ -831,6 +857,7 @@ watch(() => lesDatas.document.idFamille, (newValueF, oldValueF) => {
             }
         }
     }
+    //console.log(`idFamille: ${lesDatas.document.idFamille}`)
 })
 
 watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
@@ -1203,9 +1230,11 @@ const logEmitInit = (responseData) => {
     lesDatas.file = ref(null)    
     if (suitesauve.value == "init") {
         lesDatas.document.titre = titre.value
+        oFamille.value = null
         lesDatas.document.idFamille = ref(null)
         //Si il y a une seule famille, on la selectionne et on fabrique la liste des types
         if (itemsFamille.value.length == 1) {
+            oFamille.value = itemsFamille.value[0]
             lesDatas.document.idFamille = itemsFamille.value[0].id.toString()
             itemsType.value = []
             let itemT
