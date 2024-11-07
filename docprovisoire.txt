@@ -5,7 +5,7 @@ Props
 
 libelle			string			''
 
-Première ligne du composant, pes de ligne si ''. Exemple: Indexation d'un document de la famille photo
+Première ligne du composant, pas de ligne si ''. Exemple: Indexation d'un document de la famille photo
 
 
 titre				string			''

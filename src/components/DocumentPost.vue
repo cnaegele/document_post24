@@ -851,7 +851,13 @@ watch(() => oFamille.value, (newValueoF, oldValueoF) => {
                 if (leTitre.trim().startsWith(oldFamille) && oldFamille !== '') {
                     lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
                 } else {
-                    lesDatas.document.titre = `${newFamille} - `    
+                    let separateur = ' - '
+                    if (leTitre.startsWith('de ')) {
+                        separateur = ' '    
+                    } else if (leTitre.startsWith(' de ')) {
+                        separateur = ''
+                    }
+                    lesDatas.document.titre = `${newFamille}${separateur}${leTitre}`    
                }
 
             }
