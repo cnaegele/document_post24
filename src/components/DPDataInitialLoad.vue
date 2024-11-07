@@ -220,6 +220,7 @@ const receptionDocumentPost = (responseData) => {
           documents: [{
             iddocument: responseData.iddocument,
             titre: responseData.titre,
+            dateofficielle: responseData.dateofficielle,
             taille: responseData.taille,
             md5: responseData.md5,
             message: responseData.message,
@@ -232,6 +233,7 @@ const receptionDocumentPost = (responseData) => {
         const docReponseData = {
           iddocument: responseData.iddocument,
           titre: responseData.titre,
+          dateofficielle: responseData.dateofficielle,
           taille: responseData.taille,
           md5: responseData.md5,
           message: responseData.message,
