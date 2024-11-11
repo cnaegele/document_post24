@@ -70,6 +70,9 @@ const postDocument = (jsonDocument) => {
     emit('postDocument', jsonDocument)
 }
 
+/**
+ * @props - définies dans DPDataInitialLoadProps.js
+ */
 const props = defineProps(dpDataInitialLoadProps)
 const { codeConfigIni } = toRefs(props)
 const { jsonConfigIni } = toRefs(props)
