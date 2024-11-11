@@ -87,6 +87,13 @@ const postDocument = (jsonDocument) => {
  * 
  * Comportement après sauvegarde
  * @props {string} suitesauve - Défini le comportement après la sauvegarde du document
+ * pagedata - ouvre la page de consultation des metadonnées du document
+ * pageedit - Ouvre la page goéland d'édition des métdonnées du document
+ * keep - Conserve les données saisies sauf le fichier à poster
+ * emitinit - Emet l'évènement postDocument, réinitialise les données selon la configuration initiale
+ * emitkeep - Emet l'évènement postDocument, conserve les données saisies sauf le fichier à poster
+ * emitdocsinit - Stoque informations dans l'objet qui sera emis au clic sur [Indexation terminée], réinitialise les données selon la configuration initiale
+ * emitdocskeep - Stoque informations dans l'objet qui sera emis au clic sur [Indexation terminée], conserve les données saisies sauf le fichier à poster
  */
 const props = defineProps({
   codeConfigIni: {
@@ -209,6 +216,7 @@ if (configIni !== null) {
 }
 //console.log(lesDatasIni.value)
 
+//Modification de la propriété suitesauve, il faut adapter la propriété suitesauve de DocumentPost
 watch(() => props.suitesauve, (newVal, oldVal) => {
   suiteSauveDP.value = determineSuiteSauveDP(newVal)
 })
@@ -220,21 +228,21 @@ const docsResponseData = []
  * objet retourné par documentPost::postDocument
  * {
  *    success
- *    iddocument
- *    titre
- *    dateofficielle
- *    taille
- *    md5
- *    message
+ *    document [{
+ *      iddocument
+ *      titre
+ *      dateofficielle
+ *      taille
+ *      md5
+ *      message }]
  * }
  * suitesauve : pagedata - Ouvre la page goéland de consultation des métdonnées du document
  * suitesauve : pageedit - Ouvre la page goéland d'édition des métdonnées du document
- * 
- * 
- * 
- * 
- * 
- * 
+ * suitesauve : keep - Conserve les données saisies sauf le fichier à poster
+ * suitesauve : emitinit - Emet l'évènement postDocument, réinitialise les données selon la configuration initiale
+ * suitesauve : emitkeep - Emet l'évènement postDocument, conserve les données saisies sauf le fichier à poster
+ * suitesauve : emitdocsinit - Stoque informations dans l'objet qui sera emis au clic sur [Indexation terminée], réinitialise les données selon la configuration initiale
+ * suitesauve : emitdocskeep - Stoque informations dans l'objet qui sera emis au clic sur [Indexation terminée], conserve les données saisies sauf le fichier à poster
  */
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
