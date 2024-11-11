@@ -1187,32 +1187,6 @@ const supprimeGroupeSecuriteDroitConsultation = (index) => {
 
 const sauveData = async () => {
     const responseData = await demandeSauveData()
-    //je ne comprends pas pourquoi que bien que je sois en await
-    //mon réponse data est parfois vide.
-    //Comme ça me gave... il peu y avoir un petit délai
-    if (responseData.hasOwnProperty("success")) {
-        logEmitInit(responseData)    
-    } else {
-        let bOk = false;
-        for (let i=0; i<20; i++) {            
-            setTimeout(() => {
-                console.log(`setTimeout ${i.toString()}`)
-                if (responseData.hasOwnProperty("success")) {
-                    bOk = true
-                    logEmitInit(responseData)
-                }                
-            }, 500)
-            if (bOk) {
-                break;
-            }
-        }
-        if (!bOk) {
-            logEmitInit(responseData)    
-        }
-    }
-}
-
-const logEmitInit = (responseData) => {
     if (responseData.hasOwnProperty("success")) {
         if (responseData.success) {
             if (messageLog.value != '') {
@@ -1225,6 +1199,8 @@ const logEmitInit = (responseData) => {
         emit('postDocument', responseData)
     } else {
         //Pas de réponse prévue du serveur
+        //je ne comprends pas pourquoi que bien que je sois en await
+        //mon réponse data est parfois vide.
         const reponseErreurServeur = {
             "success": false,
             "message": 'Erreur imprevue pas de réponse du serveur',

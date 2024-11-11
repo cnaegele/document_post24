@@ -59,6 +59,9 @@
 </template>
 
 <script setup>
+/**
+ * Composant DPDataInitialLoad permet de passer des propriétes au composant DocumentPost
+ */
 import { ref, toRefs, watch } from 'vue'
 import { documentPostPropsIni } from '@/configurationini.js'
 
@@ -67,10 +70,24 @@ const postDocument = (jsonDocument) => {
     emit('postDocument', jsonDocument)
 }
 
-//codeConfigIni renvoie vers un fichier de configuration
-//jsonConfigIni est une chaine json de configuration
-//Si les 2 sont utilisés, pour les éventuels paramètres présents 2x
-//c'est ceux trouvés dans jsonConfigIni qui prennent le dessus 
+/**
+ * Fichier de configuration
+ * @props {string} codeConfigIni - Détermine le fichier de configuration json contenant 
+ * la valeur de certaines propriétes à passer au composant DocumentPost
+ * @example
+ * photo - va lire sur le serveur le fichier /goeland/document/nouveau/json/photo.json
+ * 
+ * Chaine json de configuration
+ * @props {string} jsonConfigIni - Chaine json contenant la valeur de certaines propriétés
+ * à passer au composant DocumentPost
+ * Les éventuelles propriétés définies dans le fichier défini par codeConfigIni ET dans jsonConfigIni
+ * seront celles de jsonConfigIni, celles du fichier étant ignorée
+ * @example
+ * {"titre":"Gare 22 - ","sujet":"#444","auteursacteur":[10000],"objetslies":[1000,10000]}
+ * 
+ * Comportement après sauvegarde
+ * @props {string} suitesauve - Défini le comportement après la sauvegarde du document
+ */
 const props = defineProps({
   codeConfigIni: {
       type: String,
@@ -189,9 +206,6 @@ if (configIni !== null) {
   if (configIni.hasOwnProperty("objetslies")) {
     lesDatasIni.value.objetslies = configIni.objetslies
   }
-  // exemple : /?jsonprms=%7B"titre"%3A"Gare%2022%20-%20"%2C"sujet"%3A"%23444"%2C"auteursacteur"%3A%5B10000%5D%2C"objetslies"%3A%5B1000%2C10000%5D%7D
-  // avec : %7B"titre"%3A"Gare%2022%20-%20"%2C"sujet"%3A"%23444"%2C"auteursacteur"%3A%5B10000%5D%2C"objetslies"%3A%5B1000%2C10000%5D%7D 
-  //qui est le encodeURIComponent de: {"titre":"Gare 22 - ","sujet":"#444","auteursacteur":[10000],"objetslies":[1000,10000]}
 }
 //console.log(lesDatasIni.value)
 
@@ -200,6 +214,28 @@ watch(() => props.suitesauve, (newVal, oldVal) => {
 })
 
 const docsResponseData = []
+/**
+ * Traitement selon la valeur de la propriété suitesauve de l'évènement postDocument emit par documentPost
+ * @param responseData 
+ * objet retourné par documentPost::postDocument
+ * {
+ *    success
+ *    iddocument
+ *    titre
+ *    dateofficielle
+ *    taille
+ *    md5
+ *    message
+ * }
+ * suitesauve : pagedata - Ouvre la page goéland de consultation des métdonnées du document
+ * suitesauve : pageedit - Ouvre la page goéland d'édition des métdonnées du document
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 const receptionDocumentPost = (responseData) => {
   console.log(`receptionDocumentPost suite emit ${JSON.stringify(responseData)}`)
   //const oDocument = JSON.parse(jsonData)
@@ -248,6 +284,12 @@ const receptionDocumentPost = (responseData) => {
   }
 }
 
+/**
+ * @event DPDataInitialLoad#postDocument
+ * @type {object}
+ * @property {boolean} success
+ * @property {objects array} documents
+ */ 
 const emitdocs = () => {
   emit('postDocument', {
       success: true,
