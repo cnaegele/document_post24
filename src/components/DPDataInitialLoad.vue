@@ -95,10 +95,10 @@ const suiteSauveDP = ref('init')
 suiteSauveDP.value = determineSuiteSauveDP(suitesauve.value)
 //console.log(codeConfigIni.value)
 let configIni = null
-//console.log(jsonConfigIni.value)
+console.log(jsonConfigIni.value)
 if (jsonConfigIni.value !== '') {
   configIni = JSON.parse(jsonConfigIni.value)
-  //console.log(configIni)  
+  console.log(configIni)  
 }
 
 const lesDatasIni = ref(
