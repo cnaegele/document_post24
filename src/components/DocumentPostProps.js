@@ -1,3 +1,14 @@
+/**
+ * @prop {string} libelle - Libelle s'affichant en haut de la page
+ * @default ''
+ * @example  
+ * Indexation document depuis une affaire OPC-Demande de PC 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 export const documentPostProps = {
   libelle: {
     type: String,
