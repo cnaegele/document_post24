@@ -36,19 +36,34 @@ export async function documentListeParMD5(strMD5) {
 
 export async function uploadFile(formData) {
     const urlpodo = `${g_devurl}${g_pathurldocument}document_post.php`
+    let response
     try {
-        const response = await axios.post(urlpodo, formData, {
+            response = await axios.post(urlpodo, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        // Ajoutez ici le code pour gérer la réponse du serveur
         //console.log('dans uploadFile Fichier téléchargé avec succès:', response.data)
         return(response.data)
     } catch (error) {
-        console.error('Erreur lors du téléchargement du fichier:', error)
-        // Ajoutez ici le code pour gérer les erreurs
-        return('')
+        let iddocument = 0
+        let titre = ''
+        if (response !== undefined) {
+            if (response.data.iddocument) {
+                iddocument =  response.data.iddocument   
+            }
+            if (response.data.titre) {
+                titre =  response.data.titre   
+            }
+        }
+        const messageErreur = traiteAxiosError(error)
+        const respData = {
+            "success": false,
+            "titre": titre,
+            "iddocument": iddocument,
+            "message": messageErreur,
+        }
+        return(respData)
     }        
 }
 

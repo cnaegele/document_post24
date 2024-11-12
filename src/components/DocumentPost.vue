@@ -771,101 +771,103 @@ watch(() => lesDatas.document.dateOfficielle, () => {
 })
 
 watch(() => oFamille.value, (newValueoF, oldValueoF) => {
-    console.log(oFamille.value)
-    //Le v-select a "return-object" et v-model="oFamille"
-    //et il sert à définir la famille du document (lesDatas.document.idFamille)
-    //Pourquoi tout ce binz pour retourner l'objet :
-    //Parce que on veut pouvoir avoir le même idFamille pour plusieurs options
-    // value: 11 label: Plan
-    // value: 11 label: Plan exécutoire
-    // value: 11 label: Plan de révision
-    //Ce qui permet d'utiliser le label pour l'aide à la saisie du titre du document 
-    //avec différent choix pour la seule famille plan
-    //Si on ne fait pas ça, la selection de n'importe quelle option value 11 affiche la première option valuse 11 (Plan)
-    const newValueF = newValueoF.value
-    let oldValueF = null
-    if (oldValueoF !== null) {
-        oldValueF = oldValueoF.value    
-    }
-    lesDatas.document.idFamille = newValueF
-    itemsType.value = []
-    let itemT
-    for (let i=0; i<famillestypes.value.length; i++) {
-        if (famillestypes.value[i].value == newValueF) {
-            for (let j=0; j<famillestypes.value[i].type.length; j++) {
-                itemT = {
-                    id: famillestypes.value[i].type[j].id,
-                    label: famillestypes.value[i].type[j].label,
-                    value: famillestypes.value[i].type[j].value,
-                }
-                itemsType.value.push(itemT)
-            }
-        break;    
+    if (oFamille.value !== null) {
+        console.log(oFamille.value)
+        //Le v-select a "return-object" et v-model="oFamille"
+        //et il sert à définir la famille du document (lesDatas.document.idFamille)
+        //Pourquoi tout ce binz pour retourner l'objet :
+        //Parce que on veut pouvoir avoir le même idFamille pour plusieurs options
+        // value: 11 label: Plan
+        // value: 11 label: Plan exécutoire
+        // value: 11 label: Plan de révision
+        //Ce qui permet d'utiliser le label pour l'aide à la saisie du titre du document 
+        //avec différent choix pour la seule famille plan
+        //Si on ne fait pas ça, la selection de n'importe quelle option value 11 affiche la première option valuse 11 (Plan)
+        const newValueF = newValueoF.value
+        let oldValueF = null
+        if (oldValueoF !== null) {
+            oldValueF = oldValueoF.value    
         }
-    }
-    
-    if (lesDatas.file !== null&& lesDatas.document.idFamille !== null && lesDatas.document.idFamille !== '') {
-        let bTrouve = false
-        let fileExtension = ''
-        const posi = lesDatas.file.name.lastIndexOf('.')
-        if (posi !== -1) {
-            fileExtension = lesDatas.file.name.substr(posi+1)
-            for (let i=0; i<itemsType.value.length; i++) {
-                if (itemsType.value[i].label == fileExtension) {
-                    lesDatas.document.idType = itemsType.value[i].value
-                    bTrouve = true
-                    break   
-                }
-            }
-        }
-        if (!bTrouve) {
-            lesDatas.document.idType = ''
-            lesDatas.messagesErreur.timeOutSnackbar = 10000
-            lesDatas.messagesErreur.bSnackbar = true
-            lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
-       }    
-    }
-
-    //Selon configuration familletitre "avant" ou "apres" on modifie le titre du document
-    if (familletitre.value !== '') {
-        let newFamille = '', oldFamille = ''
-        let oFT
-        let leTitre = lesDatas.document.titre
-        
-        if (newValueF !== '') {
-            oFT = famillestypes.value.find(item => item.id === newValueoF.id)
-            newFamille = oFT ? oFT.label : ''
-        }
-        if (oldValueF !== '' && oldValueF !== null) {
-            oFT = famillestypes.value.find(item => item.id === oldValueoF.id)
-            oldFamille = oFT ? oFT.label : ''
-        }
-        if (familletitre.value == 'apres') {
-            if (!leTitre.trim().endsWith(newFamille)) {
-                if (leTitre.trim().endsWith(oldFamille) && oldFamille !== '') {
-                    lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
-                } else {
-                    lesDatas.document.titre = `${leTitre} - ${newFamille}`    
-                }
-            }
-        } else if (familletitre.value == 'avant') {
-            if (!leTitre.trim().startsWith(newFamille)) {
-                if (leTitre.trim().startsWith(oldFamille) && oldFamille !== '') {
-                    lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
-                } else {
-                    let separateur = ' - '
-                    if (leTitre.startsWith('de ')) {
-                        separateur = ' '    
-                    } else if (leTitre.startsWith(' de ')) {
-                        separateur = ''
+        lesDatas.document.idFamille = newValueF
+        itemsType.value = []
+        let itemT
+        for (let i=0; i<famillestypes.value.length; i++) {
+            if (famillestypes.value[i].value == newValueF) {
+                for (let j=0; j<famillestypes.value[i].type.length; j++) {
+                    itemT = {
+                        id: famillestypes.value[i].type[j].id,
+                        label: famillestypes.value[i].type[j].label,
+                        value: famillestypes.value[i].type[j].value,
                     }
-                    lesDatas.document.titre = `${newFamille}${separateur}${leTitre}`    
-               }
-
+                    itemsType.value.push(itemT)
+                }
+            break;    
             }
         }
-    }
+        
+        if (lesDatas.file !== null&& lesDatas.document.idFamille !== null && lesDatas.document.idFamille !== '') {
+            let bTrouve = false
+            let fileExtension = ''
+            const posi = lesDatas.file.name.lastIndexOf('.')
+            if (posi !== -1) {
+                fileExtension = lesDatas.file.name.substr(posi+1)
+                for (let i=0; i<itemsType.value.length; i++) {
+                    if (itemsType.value[i].label == fileExtension) {
+                        lesDatas.document.idType = itemsType.value[i].value
+                        bTrouve = true
+                        break   
+                    }
+                }
+            }
+            if (!bTrouve) {
+                lesDatas.document.idType = ''
+                lesDatas.messagesErreur.timeOutSnackbar = 10000
+                lesDatas.messagesErreur.bSnackbar = true
+                lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
+        }    
+        }
+
+        //Selon configuration familletitre "avant" ou "apres" on modifie le titre du document
+        if (familletitre.value !== '') {
+            let newFamille = '', oldFamille = ''
+            let oFT
+            let leTitre = lesDatas.document.titre
+            
+            if (newValueF !== '') {
+                oFT = famillestypes.value.find(item => item.id === newValueoF.id)
+                newFamille = oFT ? oFT.label : ''
+            }
+            if (oldValueF !== '' && oldValueF !== null) {
+                oFT = famillestypes.value.find(item => item.id === oldValueoF.id)
+                oldFamille = oFT ? oFT.label : ''
+            }
+            if (familletitre.value == 'apres') {
+                if (!leTitre.trim().endsWith(newFamille)) {
+                    if (leTitre.trim().endsWith(oldFamille) && oldFamille !== '') {
+                        lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
+                    } else {
+                        lesDatas.document.titre = `${leTitre} - ${newFamille}`    
+                    }
+                }
+            } else if (familletitre.value == 'avant') {
+                if (!leTitre.trim().startsWith(newFamille)) {
+                    if (leTitre.trim().startsWith(oldFamille) && oldFamille !== '') {
+                        lesDatas.document.titre = leTitre.replace(oldFamille, newFamille)    
+                    } else {
+                        let separateur = ' - '
+                        if (leTitre.startsWith('de ')) {
+                            separateur = ' '    
+                        } else if (leTitre.startsWith(' de ')) {
+                            separateur = ''
+                        }
+                        lesDatas.document.titre = `${newFamille}${separateur}${leTitre}`    
+                }
+
+                }
+            }
+        }
     //console.log(`idFamille: ${lesDatas.document.idFamille}`)
+    }
 })
 
 watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
@@ -1270,10 +1272,10 @@ const sauveData = async () => {
 
 
     if (responseData.hasOwnProperty("success")) {
-        if (responseData.success) {
-            if (messageLog.value != '') {
+        if (messageLog.value != '') {
                 messageLog.value += '<br><br>'    
-            }
+        }
+        if (responseData.success) {
             messageLog.value += `${responseData.message}<br>iddocument: <a href="/goeland/document/document_data.php?iddocument=${responseData.iddocument}" target="_blank">${responseData.iddocument}</a><br>titre: ${responseData.titre}<br>taille: ${responseData.taille} octets / md5: ${responseData.md5}`    
         } else {
             messageLog.value += `<span style="color: red;">${responseData.message}</span>`    
