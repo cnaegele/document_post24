@@ -69,10 +69,10 @@ export async function uploadFile(formData) {
 
 function traiteAxiosError(error) {
     if (error.response) {
-        return `${error.response.data}<br>${error.response.status}<br>${error.response.headers}`    
+        return `error.response:<br>${error.response.data}<br>${error.response.status}<br>${error.response.headers}`    
     } else if (error.request.responseText) {
-        return error.request.responseText
+        return `error.request:<br>${error.request.responseText}`
     } else {
-        return error.message
+        return `error.message:<br>${error.message}`
     }
 }
