@@ -10,6 +10,18 @@
   right: 50px;
   z-index: 100;
 }
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+}
 </style>
 
 <template>
@@ -29,6 +41,17 @@
       ></v-btn>
     </template>
   </v-snackbar>
+
+    <!-- Loader flottant -->
+    <div 
+      v-if="loading" 
+      class="loading-overlay"
+    >
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </div>
 
   <v-container>
     <v-row dense v-if="libelle != ''">
@@ -696,6 +719,14 @@ const modeChoixGroupeSecuriteDC = ref('unique')
 
 const messageLog = ref('')
 
+const loading = ref(false)
+const showLoader = () => {
+  loading.value = true
+}
+const hideLoader = () => {
+  loading.value = false
+}
+
 const titreRules = [
     value => {
         lesDatas.controle.bDataTitreOK = false
@@ -915,16 +946,24 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
     }
 
     if (newValueFile !== undefined) {
-         //On vérifie que le fichier n'a pas déjà été indexé sur goéland
-         verifieNouveauMD5()
-         
-        //Selon configuration nomfichiertitre à "oui" on met le nom du fichier (sans extension) comme titre du document
-        if (nomfichiertitre.value == 'oui') {
-            const posi = newValueFile.name.lastIndexOf('.')
-            if (posi !== -1) {
-                lesDatas.document.titre = newValueFile.name.substr(0, posi)
-            } else {
-                lesDatas.document.titre = newValueFile.name           
+        //On vérifie que la taille du fichier ne dépasse pas la valeur limité (props du composant)
+        if (newValueFile.size > lesDatas.document.sizemax) {
+            lesDatas.messagesErreur.timeOutSnackbar = 60000
+            lesDatas.messagesErreur.bSnackbar = true
+            lesDatas.messagesErreur.messageSnackbar = `<b>Ce fichier est trop volumineux.</b><br>Taille: ${newValueFile.size} Maximum autorisé: ${lesDatas.document.sizemax}`
+            lesDatas.controle.bDataFileOK = false
+        } else {
+            //On vérifie que le fichier n'a pas déjà été indexé sur goéland
+            verifieNouveauMD5()
+            
+            //Selon configuration nomfichiertitre à "oui" on met le nom du fichier (sans extension) comme titre du document
+            if (nomfichiertitre.value == 'oui') {
+                const posi = newValueFile.name.lastIndexOf('.')
+                if (posi !== -1) {
+                    lesDatas.document.titre = newValueFile.name.substr(0, posi)
+                } else {
+                    lesDatas.document.titre = newValueFile.name           
+                }
             }
         }
     }
@@ -1265,11 +1304,11 @@ const sauveData = async () => {
     // Ajout des métadonnées JSON au FormData
     console.log(metadata)
     formData.append('metadata', JSON.stringify(metadata))
-   
+    console.log("before [jsonResponseData = await uploadFile(formData)]")
+    showLoader()
     const responseData = await uploadFile(formData)
-
-
-
+    console.log(`after [responseData = await uploadFile(formData) responseData: ${JSON.stringify(responseData)}`)
+    hideLoader()
 
     if (responseData.hasOwnProperty("success")) {
         if (messageLog.value != '') {
@@ -1397,9 +1436,11 @@ const verifieNouveauMD5 = async () => {
     } 
 
     //Lecture du contenu pour calcul md5
+    showLoader()
     const fileContents = await readFileAsArrayBuffer(lesDatas.file)
     const wordArray =  lib.WordArray.create(fileContents)
     strMD5 = MD5(wordArray).toString()
+    hideLoader()
     //console.log(`md5: ${strMD5}`)    
     const docListe = await documentListeParMD5(strMD5)
     if (docListe.length > 0) {
@@ -1422,5 +1463,4 @@ async function readFileAsArrayBuffer(file) {
       fileReader.readAsArrayBuffer(file);
     });
 }
-
 </script>

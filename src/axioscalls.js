@@ -36,31 +36,34 @@ export async function documentListeParMD5(strMD5) {
 
 export async function uploadFile(formData) {
     const urlpodo = `${g_devurl}${g_pathurldocument}document_post.php`
-    let response
+    console.log(`in [async function uploadFile(formData)] url: ${urlpodo}`)
+    //let response
     try {
-            response = await axios.post(urlpodo, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-        //console.log('dans uploadFile Fichier téléchargé avec succès:', response.data)
-        return(response.data)
+            console.log('in try axios.post(...)')
+            let response = await axios.post(urlpodo, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })        
+            if (response.status == 200) {
+                console.log('in try axios.post(...) response.status == 200')
+                return(response.data)
+            } else {
+                console.log('in try axios.post(...) ERREUR: response.status != 200')
+                const respData = {
+                    "success": false,
+                    "titre": '',
+                    "iddocument": 0,
+                    "message": `response.status: ${response.status}`,
+                }
+                return(respData)            }
     } catch (error) {
-        let iddocument = 0
-        let titre = ''
-        if (response !== undefined) {
-            if (response.data.iddocument) {
-                iddocument =  response.data.iddocument   
-            }
-            if (response.data.titre) {
-                titre =  response.data.titre   
-            }
-        }
+        console.log('in catch axios.post(...) ERREUR')
         const messageErreur = traiteAxiosError(error)
         const respData = {
             "success": false,
-            "titre": titre,
-            "iddocument": iddocument,
+            "titre": '',
+            "iddocument": 0,
             "message": messageErreur,
         }
         return(respData)

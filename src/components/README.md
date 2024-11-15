@@ -1,16 +1,12 @@
-# Components
-
-DocumentPost
-
-ActeurChoix
-
-ActeurData
-
-EmployeChoix
-
-GroupeSecuriteChoix
-
-UniteOrgChoix
+# Goéland Document Post
+## Components
+### DocumentPost
+> props : voir documentPostProps
+### ActeurChoix
+### ActeurData
+### EmployeChoix
+### GroupeSecuriteChoix
+### UniteOrgChoix
   
 
 ## 🚀 Usage
