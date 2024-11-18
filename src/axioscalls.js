@@ -46,7 +46,7 @@ export async function uploadFile(formData) {
                 }
             })        
             if (response.status == 200) {
-                console.log('in try axios.post(...) response.status == 200')
+                console.log(`in try axios.post(...) response.status == 200. response.data: ${JSON.stringify(response.data)}`)
                 return(response.data)
             } else {
                 console.log('in try axios.post(...) ERREUR: response.status != 200')
@@ -56,7 +56,8 @@ export async function uploadFile(formData) {
                     "iddocument": 0,
                     "message": `response.status: ${response.status}`,
                 }
-                return(respData)            }
+                return(respData)
+            }
     } catch (error) {
         console.log('in catch axios.post(...) ERREUR')
         const messageErreur = traiteAxiosError(error)

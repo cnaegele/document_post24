@@ -8,6 +8,7 @@ export const storedatadoc = defineStore({
             dateversion: ref('18.11.2024'),
         },
         file: ref(null),
+        filemd5: ref(''),
         document: {
             idFamille: ref(''),
             famille: ref(''),

@@ -1328,11 +1328,29 @@ const sauveData = async () => {
         //Pas de réponse prévue du serveur
         //je ne comprends pas pourquoi que bien que je sois en await
         //mon réponse data est parfois vide.
-        const reponseErreurServeur = {
-            "success": false,
-            "message": 'Erreur imprevue pas de réponse du serveur',
+        //Dans ce cas, comme tout a bien fonctionnné et que j'ai calculer le md5 du document posté
+        //On se donne une chance de continuer
+        const docListe = await documentListeParMD5(lesDatas.filemd5)
+        if (docListe.length > 0) {
+            const response2emechance = {
+                "success": true,
+                "message": 'procedure de secours recherche par md5 suite mystérieux retour serveur vide',
+                "iddocument": docListe[0].iddoc,
+                "titre": docListe[0].titredoc, 
+                "dateofficielle": '',  
+            }
+            if (messageLog.value != '') {
+                messageLog.value += '<br><br>' 
+            }   
+            messageLog.value += `${response2emechance.message}<br>iddocument: <a href="/goeland/document/document_data.php?iddocument=${response2emechance.iddocument}" target="_blank">${response2emechance.iddocument}</a><br>titre: ${response2emechance.titre}<br>md5: ${lesDatas.filemd5}`    
+            emit('postDocument', response2emechance)
+        } else {
+            const reponseErreurServeur = {
+                "success": false,
+                "message": 'Erreur imprevue pas de réponse du serveur',
+            }
+            emit('postDocument', reponseErreurServeur)
         }
-        emit('postDocument', reponseErreurServeur)
     }
 
     //réinitialisation des données du composant
@@ -1444,6 +1462,7 @@ const verifieNouveauMD5 = async () => {
     const fileContents = await readFileAsArrayBuffer(lesDatas.file)
     const wordArray =  lib.WordArray.create(fileContents)
     strMD5 = MD5(wordArray).toString()
+    lesDatas.filemd5 = strMD5
     loading.value = false
     //console.log(`md5: ${strMD5}`)    
     const docListe = await documentListeParMD5(strMD5)
