@@ -720,12 +720,6 @@ const modeChoixGroupeSecuriteDC = ref('unique')
 const messageLog = ref('')
 
 const loading = ref(false)
-const showLoader = () => {
-  loading.value = true
-}
-const hideLoader = () => {
-  loading.value = false
-}
 
 const titreRules = [
     value => {
@@ -921,8 +915,7 @@ watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
     }
 })
 
-watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
-    
+watch(() => lesDatas.file, (newValueFile, oldValueFile) => {    
     if (newValueFile !== null && newValueFile !== undefined && lesDatas.document.idFamille !== null && lesDatas.document.idFamille !== '') {
         let bTrouve = false
         let fileExtension = ''
@@ -945,13 +938,14 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
        }    
     }
 
-    if (newValueFile !== undefined) {
+    if (newValueFile !== null && newValueFile !== undefined) {
         //On vérifie que la taille du fichier ne dépasse pas la valeur limité (props du composant)
         if (newValueFile.size > lesDatas.document.sizemax) {
             lesDatas.messagesErreur.timeOutSnackbar = 60000
             lesDatas.messagesErreur.bSnackbar = true
-            lesDatas.messagesErreur.messageSnackbar = `<b>Ce fichier est trop volumineux.</b><br>Taille: ${newValueFile.size} Maximum autorisé: ${lesDatas.document.sizemax}`
+            lesDatas.messagesErreur.messageSnackbar = `<b>Ce fichier: ${newValueFile.name} est trop volumineux.</b><br>Taille: ${newValueFile.size} Maximum autorisé: ${lesDatas.document.sizemax}`
             lesDatas.controle.bDataFileOK = false
+            lesDatas.file = null
         } else {
             //On vérifie que le fichier n'a pas déjà été indexé sur goéland
             verifieNouveauMD5()
@@ -1305,12 +1299,22 @@ const sauveData = async () => {
     console.log(metadata)
     formData.append('metadata', JSON.stringify(metadata))
     console.log("before [jsonResponseData = await uploadFile(formData)]")
-    showLoader()
+    loading.value = true
     const responseData = await uploadFile(formData)
+    loading.value = false
     console.log(`after [responseData = await uploadFile(formData) responseData: ${JSON.stringify(responseData)}`)
-    hideLoader()
 
     if (responseData.hasOwnProperty("success")) {
+        if (responseData.hasOwnProperty("message")) {
+            responseData.message = decodeURIComponent(responseData.message)    
+        }
+        if (responseData.hasOwnProperty("fileName")) {
+            responseData.fileName = decodeURIComponent(responseData.fileName)    
+        }
+        if (responseData.hasOwnProperty("titre")) {
+            responseData.titre = decodeURIComponent(responseData.titre)    
+        }
+
         if (messageLog.value != '') {
                 messageLog.value += '<br><br>'    
         }
@@ -1436,11 +1440,11 @@ const verifieNouveauMD5 = async () => {
     } 
 
     //Lecture du contenu pour calcul md5
-    showLoader()
+    loading.value = true
     const fileContents = await readFileAsArrayBuffer(lesDatas.file)
     const wordArray =  lib.WordArray.create(fileContents)
     strMD5 = MD5(wordArray).toString()
-    hideLoader()
+    loading.value = false
     //console.log(`md5: ${strMD5}`)    
     const docListe = await documentListeParMD5(strMD5)
     if (docListe.length > 0) {
