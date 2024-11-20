@@ -10,7 +10,11 @@ $idCaller = 0;
 if (array_key_exists('empid', $_SESSION)) {
     $idCaller = $_SESSION['empid'];
 }
-$messageLog = '';
+$response = [
+    'success' => false,
+    'message' => rawurlencode('initialisation response dans document_post.php')
+];
+
 if ($idCaller > 0) {
     // dossier de téléchargement défini dans /data/config/goeland.ini
     $a_config = parse_ini_file('/data/config/goeland.ini', true);
@@ -32,7 +36,7 @@ if ($idCaller > 0) {
     if ($uploadDir == '' || $urlRoot == '' || $basePath == '') {
         $response = [
             'success' => false,
-            'message' => 'uploaddir ou/et  urlroot ou/et basepath non défini'
+            'message' => rawurlencode('uploaddir ou/et  urlroot ou/et basepath non défini')
         ];
     } else {
         $uploadDir = $a_config['production']['documents.uploaddir'];
@@ -182,7 +186,7 @@ if ($idCaller > 0) {
                                 $message = "Problème lors de l'insertion du document en base de données. " . $nodes->item(0)->nodeValue;
                                 $response = [
                                     'success' => false,
-                                    'message' => $message,
+                                    'message' => rawurlencode($message)
                                 ];
                             } else {
                                 $idDocument = $domDRes->getElementsByTagName('IdDocument')->item(0)->nodeValue;
@@ -275,9 +279,9 @@ if ($idCaller > 0) {
                                     $message = 'Document [' . $fileNameClient . '] indexé avec succès';
                                     $response = [
                                         'success' => true,
-                                        'message' => $message . $messageLog,
-                                        'fileName' => "$fileNameClient -> $fileNameUnique -> $nomFichier",
-                                        'titre' => $titre,
+                                        'message' => rawurlencode($message),
+                                        'fileName' => rawurlencode("$fileNameClient -> $fileNameUnique -> $nomFichier"),
+                                        'titre' => rawurlencode(utf8go_encode($titre)),
                                         'iddocument' => $idDocument,
                                         'dateofficielle' => $dateOfficielle,
                                         'taille' => $fileSize,
@@ -286,14 +290,14 @@ if ($idCaller > 0) {
                                 } else {
                                     $response = [
                                         'success' => false,
-                                        'message' => $message . $messageLog,
+                                        'message' => rawurlencode($message)
                                     ];
                                 }
                             }
                         } else {
                             $response = [
                                 'success' => false,
-                                'message' => $message . $messageLog,
+                                'message' => rawurlencode($message),
                             ];
                         }
                     } else {
@@ -301,7 +305,7 @@ if ($idCaller > 0) {
                         $message = $sSql;
                         $response = [
                             'success' => false,
-                            'message' => $message . $messageLog
+                            'message' => rawurlencode($message)
                         ];
                     }
                 } else {
@@ -312,28 +316,28 @@ if ($idCaller > 0) {
                     $message .= 'Indexé le ' . $oDoc[0]['dateindexation'] . ' par ' . $oDoc[0]['empcreateur'] . '. (' . $oDoc[0]['uniteorgcreateur'] . ')';
                     $response = [
                         'success' => false,
-                        'message' => $message . $messageLog
+                        'message' => rawurlencode($message)
                     ];
                 }
             } else {
                 // Erreur lors du déplacement du fichier
                 $response = [
                     'success' => false,
-                    'message' => 'Erreur lors du déplacement du fichier' . $messageLog
+                    'message' => 'Erreur lors du déplacement du fichier'
                 ];
             }
         } else {
             // Aucun fichier n'a été téléchargé ou une erreur s'est produite
             $response = [
                 'success' => false,
-                'message' => 'Erreur lors du téléchargement du fichier' . $messageLog
+                'message' => rawurlencode('Erreur lors du téléchargement du fichier')
             ];
         }
     }
 } else {
     $response = [
         'success' => false,
-        'message' => 'Erreur autentification impossible' . $messageLog
+        'message' => rawurlencode('Erreur autentification impossible')
     ];
 }
 

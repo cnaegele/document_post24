@@ -42,6 +42,7 @@ switch ($codeConfig) {
                     $jsonFamillesTypesDoc .= $jsonFamille;
                 }
                 $jsonPropsInit = '{"libelle":"indexation générique d\'un document (réservé au groupe GoelandManager)"';
+                $jsonPropsInit .= ',"sizemax":209715200';
                 $jsonPropsInit .= ',"famillestypes":[' . $jsonFamillesTypesDoc . ']}';
             }
         }
