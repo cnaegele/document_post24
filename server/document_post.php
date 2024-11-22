@@ -4,7 +4,7 @@ require 'gdt/gautentificationf5.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers:  *");
-header("Access-Control-Allow-Methods:  POST");
+header("Access-Control-Allow-Methods:  OPTIONS, POST");
 //$idCaller = 6;
 $idCaller = 0;
 if (array_key_exists('empid', $_SESSION)) {
@@ -343,7 +343,16 @@ if ($idCaller > 0) {
 
 // Envoyez la réponse au format JSON
 header('Content-Type: application/json');
-echo json_encode($response);
+try {
+    $responsejson = json_encode($response, JSON_THROW_ON_ERROR);
+    echo $responsejson;
+} catch (JsonException $e) {
+    $response = [
+        'success' => false,
+        'message' => rawurlencode('Erreur de conversion JSON: ' . $e->getMessage())
+    ];
+    echo json_encode($response);
+}
 
 function prepareMSSQLvarchar($str) {
     $str = trim($str);

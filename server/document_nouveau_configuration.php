@@ -1,8 +1,9 @@
 <?php
-require 'gdt/gautentificationf5.php';
+//require 'gdt/gautentificationf5.php';
 require_once 'gdt/cldbgoeland.php';
 require_once '/data/dataweb/GoelandWeb/webservice/employe/clCNWSEmployeSecurite.php';
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods:  OPTIONS, GET");
 header('Content-Type: application/json; charset=utf-8');
 $codeConfig = 'defaut';
 if (isset($_GET['codeconfig'])) {
@@ -10,6 +11,7 @@ if (isset($_GET['codeconfig'])) {
 }
 switch ($codeConfig) {
     case 'generic':
+        //Réservé au groupe GoelandManager
         //$idCaller = 6;
         $idCaller = 0;
         if (array_key_exists('empid', $_SESSION)) {
