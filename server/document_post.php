@@ -1,15 +1,15 @@
 <?php
 require_once 'gdt/cldbgoeland.php';
-require 'gdt/gautentificationf5.php';
+//require 'gdt/gautentificationf5.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers:  *");
 header("Access-Control-Allow-Methods:  OPTIONS, POST");
-//$idCaller = 6;
-$idCaller = 0;
-if (array_key_exists('empid', $_SESSION)) {
-    $idCaller = $_SESSION['empid'];
-}
+$idCaller = 6;
+//$idCaller = 0;
+//if (array_key_exists('empid', $_SESSION)) {
+//    $idCaller = $_SESSION['empid'];
+//}
 $response = [
     'success' => false,
     'message' => rawurlencode('initialisation response dans document_post.php')
@@ -50,7 +50,7 @@ if ($idCaller > 0) {
             $extensionClient = '';
             $pospoint = strrpos($fileNameClient, '.');
             if ($pospoint !== false) {
-                $extensionClient = substr($fileNameClient, $pospoint+1);
+                $extensionClient = strtolower(substr($fileNameClient, $pospoint+1)); //important, extension toujours en minuscule
                 if (strlen(str_replace(' ', '',  $extensionClient)) > 4) {
                     $extensionClient = '';
                 }
@@ -78,6 +78,9 @@ if ($idCaller > 0) {
 
                     //Contrôle cohérence type document, mimetype, extension
                     $docExtension = $extensionClient;
+                    if ($docExtension == 'jpeg') {
+                        $docExtension = 'jpg'; //on utilise jpg dans goéland
+                    }
                     $idType = $metadata['idtype'] ?? '0';
                     //Le mime type reçu avec $_FILES['file']['type']ne dépend que de l'extension depuis un POST de microsoft.
                     //Pour certain type, on fait une vérification plus sérieuse.

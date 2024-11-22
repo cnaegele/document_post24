@@ -835,7 +835,7 @@ watch(() => oFamille.value, (newValueoF, oldValueoF) => {
             let fileExtension = ''
             const posi = lesDatas.file.name.lastIndexOf('.')
             if (posi !== -1) {
-                fileExtension = lesDatas.file.name.substr(posi+1)
+                fileExtension = lesDatas.file.name.substr(posi+1).toLowerCase() // important, toujours passer en minuscule
                 for (let i=0; i<itemsType.value.length; i++) {
                     if (itemsType.value[i].label == fileExtension) {
                         lesDatas.document.idType = itemsType.value[i].value
@@ -900,7 +900,7 @@ watch(() => lesDatas.document.idType, (newValueT, oldValueT) => {
         let fileExtension = ''
         const posi = lesDatas.file.name.lastIndexOf('.')
         if (posi !== -1) {
-            fileExtension = lesDatas.file.name.substr(posi+1)
+            fileExtension = lesDatas.file.name.substr(posi+1).toLowerCase() // important, toujours passer en minuscule
             for (let i=0; i<itemsType.value.length; i++) {
                 if (itemsType.value[i].value == newValueT) {
                     if (itemsType.value[i].label !== fileExtension) {
@@ -921,7 +921,7 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
         let fileExtension = ''
         const posi = newValueFile.name.lastIndexOf('.')
         if (posi !== -1) {
-            fileExtension = newValueFile.name.substr(posi+1)
+            fileExtension = newValueFile.name.substr(posi+1).toLowerCase() // important, toujours passer en minuscule
             for (let i=0; i<itemsType.value.length; i++) {
                 if (itemsType.value[i].label == fileExtension) {
                     lesDatas.document.idType = itemsType.value[i].value
