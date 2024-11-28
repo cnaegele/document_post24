@@ -95,10 +95,8 @@ const suiteSauveDP = ref('init')
 suiteSauveDP.value = determineSuiteSauveDP(suitesauve.value)
 //console.log(codeConfigIni.value)
 let configIni = null
-console.log(jsonConfigIni.value)
 if (jsonConfigIni.value !== '') {
   configIni = JSON.parse(jsonConfigIni.value)
-  console.log(configIni)  
 }
 
 const lesDatasIni = ref(
@@ -157,8 +155,14 @@ if (propsIni.hasOwnProperty("sizemax")) {
 }
 
 if (configIni !== null) {
+  if (configIni.hasOwnProperty("libelle")) {
+    lesDatasIni.value.libelle = configIni.libelle
+  }  
   if (configIni.hasOwnProperty("titre")) {
     lesDatasIni.value.titre = configIni.titre
+  }
+  if (configIni.hasOwnProperty("nomfichiertitre")) {
+    lesDatasIni.value.nomfichiertitre = configIni.nomfichiertitre
   }
   if (configIni.hasOwnProperty("sujet")) {
     lesDatasIni.value.sujet = configIni.sujet
