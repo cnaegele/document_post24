@@ -43,14 +43,15 @@
   </v-snackbar>
 
     <!-- Loader flottant -->
-    <div 
+    <div
       v-if="loading" 
-      class="loading-overlay"
+      class="loading-overlay d-flex flex-column align-center justify-center"
     >
       <v-progress-circular
         indeterminate
         color="primary"
       ></v-progress-circular>
+      <div class="mt-2">{{ messageloading }}</div>
     </div>
 
   <v-container>
@@ -627,11 +628,10 @@
   
 <script setup>
 import { ref, onMounted, toRefs, watch } from 'vue'
-import { MD5, lib } from 'crypto-js'
 import { storeuser } from '@/stores/user.js'
 import { storedatadoc } from '@/stores/data.js'
 import { documentPostProps } from '@/components/DocumentPostProps.js'
-import { documentListeParMD5, uploadFile, getDicoNiveauConfidentialite } from '@/axioscalls.js'
+import { documentListeParSHA256, uploadFile, getDicoNiveauConfidentialite } from '@/axioscalls.js'
 import { objetInfoParId } from '@/axioscalls_objet.js'
 import { employeInfoParId } from '@/axioscalls_employe.js'
 import { acteurInfoParId } from '@/axioscalls_acteur.js'
@@ -720,6 +720,7 @@ const modeChoixGroupeSecuriteDC = ref('unique')
 const messageLog = ref('')
 
 const loading = ref(false)
+const messageloading = ref('')
 
 const titreRules = [
     value => {
@@ -948,7 +949,7 @@ watch(() => lesDatas.file, (newValueFile, oldValueFile) => {
             lesDatas.file = null
         } else {
             //On vérifie que le fichier n'a pas déjà été indexé sur goéland
-            verifieNouveauMD5()
+            verifieNouveauSHA256()
             
             //Selon configuration nomfichiertitre à "oui" on met le nom du fichier (sans extension) comme titre du document
             if (nomfichiertitre.value == 'oui') {
@@ -1233,8 +1234,8 @@ const sauveData = async () => {
     }
 
     //On reverifie au cas où un utilisateur plus rapide a indexé le fichier après sa selection
-    //const bNouveauMD5 = await verifieNouveauMD5()
-    //if (!bNouveauMD5) {
+    //const bNouveauSHA256 = await verifieNouveauSHA256()
+    //if (!bNouveauSHA256) {
     //    return
     //}
 
@@ -1300,8 +1301,10 @@ const sauveData = async () => {
     formData.append('metadata', JSON.stringify(metadata))
     console.log("before [jsonResponseData = await uploadFile(formData)]")
     loading.value = true
+    messageloading.value = "transfert du document"
     const responseData = await uploadFile(formData)
     loading.value = false
+    messageloading.value = ""
     console.log(`after [responseData = await uploadFile(formData) responseData: ${JSON.stringify(responseData)}`)
 
     if (responseData.hasOwnProperty("success")) {
@@ -1325,12 +1328,18 @@ const sauveData = async () => {
         }
         emit('postDocument', responseData)
     } else {
+        const reponseErreurServeur = {
+                "success": false,
+                "message": 'Erreur imprevue pas de réponse du serveur',
+            }
+        emit('postDocument', reponseErreurServeur)
+        /*    
         //Pas de réponse prévue du serveur
         //je ne comprends pas pourquoi que bien que je sois en await
         //mon réponse data est parfois vide.
         //Dans ce cas, comme tout a bien fonctionnné et que j'ai calculer le md5 du document posté
         //On se donne une chance de continuer
-        const docListe = await documentListeParMD5(lesDatas.filemd5)
+        const docListe = await documentListeParSHA256(lesDatas.filemd5)
         if (docListe.length > 0) {
             const response2emechance = {
                 "success": true,
@@ -1351,6 +1360,7 @@ const sauveData = async () => {
             }
             emit('postDocument', reponseErreurServeur)
         }
+        */
     }
 
     //réinitialisation des données du composant
@@ -1449,32 +1459,39 @@ onMounted(async () => {
     } 
 })
 
-const verifieNouveauMD5 = async () => {
+const verifieNouveauSHA256 = async () => {
     const lesDatas = storedatadoc()
-    let strMD5 = ''
-
     if (!lesDatas.file) {
         return true
     } 
 
-    //Lecture du contenu pour calcul md5
-    loading.value = true
-    const fileContents = await readFileAsArrayBuffer(lesDatas.file)
-    const wordArray =  lib.WordArray.create(fileContents)
-    strMD5 = MD5(wordArray).toString()
-    lesDatas.filemd5 = strMD5
-    loading.value = false
-    //console.log(`md5: ${strMD5}`)    
-    const docListe = await documentListeParMD5(strMD5)
-    if (docListe.length > 0) {
+    try {
+        loading.value = true
+        messageloading.value = "vérification que le document n'existe pas déjà sur goéland"
+        const strSHA256 = await calculateSHA256(lesDatas.file);
+        lesDatas.filesha256 = strSHA256
+        const docListe = await documentListeParSHA256(strSHA256)
+        loading.value = false
+        messageloading.value = ""
+        if (docListe.length > 0) {
+            lesDatas.messagesErreur.timeOutSnackbar = 60000
+            lesDatas.messagesErreur.bSnackbar = true
+            lesDatas.messagesErreur.messageSnackbar = `<b>Ce document existe déjà sur goéland</b><br><b>Id:</b> ${docListe[0].iddoc}<br><b>Titre:</b> ${docListe[0].titredoc}<br><i>indexé le ${docListe[0].dateindexation} par ${docListe[0].empcreateur} / ${docListe[0].uniteorgcreateur}</i>`
+            lesDatas.controle.bDataFileOK = false
+            return false
+        } else {
+            lesDatas.controle.bDataFileOK = true
+            return true
+        }
+    } catch (error) {
+        loading.value = false
+        messageloading.value = ""
+        console.error('Erreur de calcul du hash:', error);
         lesDatas.messagesErreur.timeOutSnackbar = 60000
         lesDatas.messagesErreur.bSnackbar = true
-        lesDatas.messagesErreur.messageSnackbar = `<b>Ce document existe déjà sur goéland</b><br><b>Id:</b> ${docListe[0].iddoc}<br><b>Titre:</b> ${docListe[0].titredoc}<br><i>indexé le ${docListe[0].dateindexation} par ${docListe[0].empcreateur} / ${docListe[0].uniteorgcreateur}</i>`
+        lesDatas.messagesErreur.messageSnackbar = `<b>Erreur de calcul du hash:</b><br><b>Id:</b> ${error}</b>`
         lesDatas.controle.bDataFileOK = false
         return false
-    } else {
-        lesDatas.controle.bDataFileOK = true
-        return true
     }
 }
 
@@ -1485,5 +1502,49 @@ async function readFileAsArrayBuffer(file) {
       fileReader.onerror = (error) => reject(error);
       fileReader.readAsArrayBuffer(file);
     });
+}
+
+// Fonction pour calculer le hash SHA-256 d'un fichier
+async function calculateSHA256(file) {
+    return new Promise((resolve, reject) => {
+        // Vérifier si l'API Web Crypto est disponible
+        if (!window.crypto || !window.crypto.subtle) {
+            reject(new Error('Web Crypto API non supportée'));
+            return
+        }
+
+        // Créer un FileReader pour lire le contenu du fichier
+        const reader = new FileReader();
+
+        reader.onload = async (event) => {
+            try {
+                // Convertir le contenu du fichier en ArrayBuffer
+                const arrayBuffer = event.target.result
+
+                // Calculer le hash SHA-256
+                const hashBuffer = await window.crypto.subtle.digest(
+                    'SHA-256', 
+                    arrayBuffer
+                )
+
+                // Convertir le hash en chaîne hexadécimale
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('')
+
+                resolve(hashHex);
+            } catch (error) {
+                reject(error)
+            }
+        };
+
+        reader.onerror = (error) => {
+            reject(error);
+        };
+
+        // Lire le fichier comme un ArrayBuffer
+        reader.readAsArrayBuffer(file);
+    })
 }
 </script>

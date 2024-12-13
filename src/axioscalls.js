@@ -24,10 +24,10 @@ export async function getDicoNiveauConfidentialite() {
     return response.data
 }
 
-export async function documentListeParMD5(strMD5) {
-    const urldlm = `${g_devurl}${g_pathurldocument}document_liste_parmd5.php`
-    const params = new URLSearchParams([['md5', strMD5]])
-    const response = await axios.get(urldlm, { params })
+export async function documentListeParSHA256(strSHA256) {
+    const urldls = `${g_devurl}${g_pathurldocument}document_liste_parsha256.php`
+    const params = new URLSearchParams([['sha256', strSHA256]])
+    const response = await axios.get(urldls, { params })
         .catch(function (error) {
             return traiteAxiosError(error)
         })

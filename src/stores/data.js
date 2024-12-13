@@ -4,11 +4,12 @@ export const storedatadoc = defineStore({
     id: 'iddata',
     state: () => ({
         env: {
-            version: ref('1.0.3'),
-            dateversion: ref('22.11.2024'),
+            version: ref('1.0.4'),
+            dateversion: ref('13.12.2024'),
         },
         file: ref(null),
         filemd5: ref(''),
+        filesha256: ref(''),
         document: {
             idFamille: ref(''),
             famille: ref(''),
