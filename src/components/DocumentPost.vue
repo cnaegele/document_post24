@@ -624,6 +624,8 @@
       </v-card>
     </template>
   </v-dialog>
+
+  <!--<AdresseChoix></AdresseChoix> -->
 </template>
   
 <script setup>
@@ -639,6 +641,8 @@ import EmployeChoix from '@/components/employe/EmployeChoix.vue'
 import ActeurChoix from '@/components/acteur/ActeurChoix.vue'
 import UniteOrgChoix from '@/components/uniteorg/UniteOrgChoix.vue';
 import GroupeSecuriteChoix from '@/components/groupesecurite/GroupeSecuriteChoix.vue';
+import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
+
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
