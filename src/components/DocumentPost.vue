@@ -1035,18 +1035,30 @@ const choixActeur = () => {
 const receptionActeurAuteur = (idacteur, jsonData) => {
     //console.log(jsonData)
     const oActeurAuteur = JSON.parse(jsonData)
-    if (lesDatas.document.acteurAuteur.length > 0) {
-        for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
-            if (lesDatas.document.acteurAuteur[i].id == oActeurAuteur.acteurid) {
-                return //déjà sélectionné
+    let aoActeurAuteur = []
+    if (Array.isArray(oActeurAuteur) === false) {
+        aoActeurAuteur.push(oActeurAuteur)
+    } else {
+        aoActeurAuteur = oActeurAuteur   
+    }
+    console.log(aoActeurAuteur)
+    for (let ai=0; ai<aoActeurAuteur.length; ai++) {
+        let bdeja = false
+        if (lesDatas.document.acteurAuteur.length > 0) {
+            for (let i=0; i<lesDatas.document.acteurAuteur.length; i++) {
+                if (lesDatas.document.acteurAuteur[i].id == aoActeurAuteur[ai].acteurid) {
+                    bdeja = true //déjà sélectionné
+                }
             }
         }
+        if (!bdeja) {
+            const acteurA = {
+                id: aoActeurAuteur[ai].acteurid,
+                nom: aoActeurAuteur[ai].acteurnom,
+            }
+            lesDatas.document.acteurAuteur.push(acteurA)
+        }
     }
-    const acteurA = {
-        id: oActeurAuteur.acteurid,
-        nom: oActeurAuteur.acteurnom,
-    }
-    lesDatas.document.acteurAuteur.push(acteurA)
     closeCardActeurChoix()
 }
 const closeCardActeurChoix = () => {
