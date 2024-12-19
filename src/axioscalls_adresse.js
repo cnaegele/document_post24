@@ -5,17 +5,15 @@ if (import.meta.env.DEV) {
 }
 const g_pathurladresse = '/goeland/adresse/axios/'
 
-
 export async function getAdressesListe(jsonCriteres) {
     const urlal = `${g_devurl}${g_pathurladresse}adresse_liste.php`
     const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
-    return '{"message":"go gléglé"}'
     //return jsonCriteres
     const response = await axios.get(urlal, { params })
         .catch(function (error) {
             return traiteAxiosError(error)
         })
-    return response.data
+        return response.data
 }
 
 function traiteAxiosError(error) {

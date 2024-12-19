@@ -519,6 +519,42 @@
     <template v-slot:activator="{ props: activatorProps }">
       <div style="display: none;">
         <v-btn
+          id="btnActiveCardChoixObjet"
+          v-bind="activatorProps"
+        ></v-btn>
+      </div>
+    </template>
+
+    <template v-slot:default="isActive">
+      <v-card>
+        <v-card-actions>
+          <span class="cardTitre"><h3>Choix d'un objet</h3> (cliquez sur le nom pour sélectionner)<br>développement en cours, pas utilisable, ci-dessous choix adresse qui sera dans le futur choix objet, option [parcelle et bâtiment par adresse]</span>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Fermer"
+            variant="tonal"
+            @click="closeCardObjetChoix"
+          ></v-btn>
+        </v-card-actions>
+        <v-card-text>
+            <div>
+                <AdresseChoix 
+                    critereTypeInit="nom"
+                    nombreMaximumRetour="100"
+                    :modeChoix="'unique'"
+                    @choixAdresse="receptionAdresse"
+                />
+
+            </div>
+       </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+
+  <v-dialog max-width="1280">
+    <template v-slot:activator="{ props: activatorProps }">
+      <div style="display: none;">
+        <v-btn
           id="btnActiveCardChoixEmployeDC"
           v-bind="activatorProps"
         ></v-btn>
@@ -624,8 +660,6 @@
       </v-card>
     </template>
   </v-dialog>
-
-  <!--<AdresseChoix></AdresseChoix> -->
 </template>
   
 <script setup>
@@ -1087,7 +1121,8 @@ const ajoutObjetLie = async (idObjetPrm) => {
         idObjetPrm = idObjetLieAjout.value.trim()
     }
     if (idObjetPrm === "") {
-        inpIdObjetLieAjout.value.$el.querySelector('input').focus()    
+        //inpIdObjetLieAjout.value.$el.querySelector('input').focus()
+        document.getElementById("btnActiveCardChoixObjet").click()    
     } else {
         if (/^\+?(0|[1-9]\d*)$/.test(idObjetPrm)) {
             if (idObjetPrm > 0 && idObjetPrm <= 999999999) {
@@ -1123,6 +1158,20 @@ const ajoutObjetLie = async (idObjetPrm) => {
 
 const supprimeLienObjet = (index) => {
     lesDatas.document.objetsLies.splice(index, 1)
+}
+
+const closeCardObjetChoix = () => {
+  document.getElementById("btnActiveCardChoixObjet").click()    
+}
+
+//Provisoirement ici, ira dans ObjetChoix.vue
+const receptionAdresse = (idadresse, jsonData) => {
+    //console.log(jsonData)
+    const oAdresse = JSON.parse(jsonData)
+    console.log(oAdresse)
+    //todo traiter le retour adresse...
+    //closeCardAdresseChoix()
+    closeCardObjetChoix()
 }
 
 const choixEmployesDroitConsultation = (modeChoix) => {

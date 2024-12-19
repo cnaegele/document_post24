@@ -7,8 +7,8 @@
           v-model="critereType"
           inline
           density="compact">
-          <v-radio label="début nom principal, numéro" :value="'nom'"></v-radio>&nbsp;&nbsp;
-          <v-radio label="nom complet, numéro" :value="'nomcomplet'"></v-radio>&nbsp;&nbsp;
+          <v-radio label="début nom principal rue, numéro" :value="'nom'"></v-radio>&nbsp;&nbsp;
+          <v-radio label="adresse complète, numéro" :value="'nomcomplet'"></v-radio>&nbsp;&nbsp;
         </v-radio-group>  
       </v-col>
     </v-row>
@@ -24,25 +24,62 @@
         ></v-text-field>  
       </v-col>
     </v-row>
+    <v-row v-if="messageErreur != ''">
+      <v-col cols="8" md="8" v-html="messageErreur"></v-col>  
+    </v-row>
+    <v-row v-if="modeChoix=='multiple' && adressesListeChoisi.length > 0" no-gutters>
+      <v-col cols="8" md="8">
+        <v-list max-height="400">
+          <v-list-subheader>
+            Adresses choisies ({{ adressesListeChoisi.length }})
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <v-btn
+              rounded="lg"
+              @click="choixTermine()"
+            >Choix terminé</v-btn>
+          </v-list-subheader>
+          <v-list-item
+            v-for="adresse in adressesListeChoisi"
+              :key="adresse.idadresse"
+              :value="adresse.idadresse"
+              :title="`${adresse.rue} ${adresse.numero}`"
+         >
+          <template v-slot:append>
+              <v-btn
+                color="grey-lighten-1"
+                icon="mdi-delete"
+                variant="text"
+                @click="supprimeChoix(adresse.idadresse)"
+              ></v-btn>
+            </template>
+        </v-list-item>
+        </v-list>
+      </v-col>
+    </v-row>
+    <v-row v-if="modeChoix=='multiple' && adressesListeChoisi.length > 0" no-gutters>
+      <v-col cols="8" md="8">
+        &nbsp;
+      </v-col>
+    </v-row>
     <v-row no-gutters>
       <v-col cols="8" md="8">
         <v-list max-height="400">
           <v-list-subheader>{{ libelleListe }}</v-list-subheader>
           <v-list-item
             v-for="adresse in adressesListeSelect"
-            :key="adresse.adresseid"
-            :value="adresse.adresseid"
-            :title="adresse.libelle"
+            :key="adresse.idadresse"
+            :value="adresse.idadresse"
+            :title="`${adresse.rue} ${adresse.numero}`"
             @click="choixAdresse(adresse)"
           >
             <template v-slot:append>
               <v-btn
                 color="grey-lighten-1"
-                icon="mdi-information"
+                icon="mdi-map-outline"
                 variant="text"
                 @mouseenter="infoMouseEnter()"
                 @mouseleave="infoMouseLeave()"
-                @click="infoActeur(acteur.acteurid)"
+                @click="openGC(adresse.coordeo, adresse.coordsn)"
               ></v-btn>
             </template>
 
@@ -94,7 +131,7 @@ watch(critereType, (newValue, oldValue) => {
   switch (newValue) {
     case 'nom':
     case 'nomcomplet':
-      labelTextField.value = 'nom'
+      labelTextField.value = 'adresse'
       txtCritere.value = ''
       break
   }
@@ -116,7 +153,7 @@ const onInputCritere = () => {
 }
 
 const prepareRechercheAdresses = () => {
-    const critere = txtCritere.value.trim()
+    const critere = txtCritere.value.replace(',', '').trim()
     const crType = critereType.value
     let critereRue = critere
     let critereNumero = ''
@@ -151,6 +188,7 @@ const rechercheAdresses = async (crType, critereRue, critereNumero, critereNumEx
     console.log (JSON.stringify(oCritere))
 
     let adressesListe = await getAdressesListe(JSON.stringify(oCritere))
+    //console.log(adressesListe)
     if (adressesListe.hasOwnProperty('message')) {
         messageErreur.value += adressesListe.message + '<br>'
         adressesListe = []
@@ -160,7 +198,40 @@ const rechercheAdresses = async (crType, critereRue, critereNumero, critereNumEx
     } else {
         libelleListe.value = `Choix adresses (${adressesListe.length}). Attention, plus de ${nombreMaximumRetour} adresses correspondent aux critères`
     }
-    console.log(adressesListe)
     adressesListeSelect.value = adressesListe
+}
+
+let demandeOpenGC = false
+const emit = defineEmits(['choixAdresse'])
+
+const choixAdresse = (adresse) => {
+  if (demandeOpenGC == false) {
+    if (modeChoix.value == 'unique') {
+      emit('choixAdresse', adresse.idadresse, JSON.stringify(adresse))
+    } else if (modeChoix.value == 'multiple') {
+      if (adressesListeChoisi.value.some(objet => objet.idadresse === adresse.idadresse) === false) {
+        adressesListeChoisi.value.push(adresse)
+      }
+    }
+  }
+}
+
+const supprimeChoix = (idadresse) => {
+  adressesListeChoisi.value = adressesListeChoisi.value.filter(objet => objet.idadresse !== idadresse)  
+}
+
+const choixTermine = () => {
+  emit('choixAdresse', 0, JSON.stringify(adressesListeChoisi.value))
+  adressesListeChoisi.value = [] 
+}
+
+const infoMouseEnter = () => {
+  demandeOpenGC = true
+}
+const infoMouseLeave = () => {
+  demandeOpenGC = false
+}
+const openGC = (x, y) => {
+  window.open(`https://carto.lausanne.ch/?map_x=${x}&map_y=${y}y&map_zoom=7`, "gclausanne")
 }
 </script>
