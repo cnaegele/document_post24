@@ -538,13 +538,9 @@
         </v-card-actions>
         <v-card-text>
             <div>
-                <AdresseChoix 
-                    critereTypeInit="nom"
-                    nombreMaximumRetour="100"
-                    :modeChoix="'unique'"
-                    @choixAdresse="receptionAdresse"
-                />
-
+                <ObjetChoix
+                    @choixObjet="receptionObjet">
+                </ObjetChoix>
             </div>
        </v-card-text>
       </v-card>
@@ -675,8 +671,7 @@ import EmployeChoix from '@/components/employe/EmployeChoix.vue'
 import ActeurChoix from '@/components/acteur/ActeurChoix.vue'
 import UniteOrgChoix from '@/components/uniteorg/UniteOrgChoix.vue';
 import GroupeSecuriteChoix from '@/components/groupesecurite/GroupeSecuriteChoix.vue';
-import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
-
+import ObjetChoix from '@/components/objet/ObjetChoix.vue'
 
 const emit = defineEmits(['postDocument'])
 const postDocument = (jsonDocument) => {
@@ -1164,14 +1159,12 @@ const closeCardObjetChoix = () => {
   document.getElementById("btnActiveCardChoixObjet").click()    
 }
 
-//Provisoirement ici, ira dans ObjetChoix.vue
-const receptionAdresse = (idadresse, jsonData) => {
+const receptionObjet = (idObjet, jsonData) => {
     //console.log(jsonData)
-    const oAdresse = JSON.parse(jsonData)
-    console.log(oAdresse)
-    //todo traiter le retour adresse...
-    //closeCardAdresseChoix()
-    closeCardObjetChoix()
+    const oObjet = JSON.parse(jsonData)
+    console.log(oObjet)
+    //todo traiter le retour objet...
+     closeCardObjetChoix()
 }
 
 const choixEmployesDroitConsultation = (modeChoix) => {
