@@ -82,12 +82,10 @@
                 @click="openGC(adresse.coordeo, adresse.coordsn)"
               ></v-btn>
             </template>
-
           </v-list-item>
         </v-list>
       </v-col>  
     </v-row>
-
   </v-container>  
 </template>
 <script setup>
@@ -208,6 +206,10 @@ const choixAdresse = (adresse) => {
   if (demandeOpenGC == false) {
     if (modeChoix.value == 'unique') {
       emit('choixAdresse', adresse.idadresse, JSON.stringify(adresse))
+      txtCritere.value = ''
+      libelleListe.value = 'choix adresses (0)'
+      adressesListeSelect.value = []
+      adressesListeChoisi.value = [] 
     } else if (modeChoix.value == 'multiple') {
       if (adressesListeChoisi.value.some(objet => objet.idadresse === adresse.idadresse) === false) {
         adressesListeChoisi.value.push(adresse)
@@ -222,6 +224,9 @@ const supprimeChoix = (idadresse) => {
 
 const choixTermine = () => {
   emit('choixAdresse', 0, JSON.stringify(adressesListeChoisi.value))
+  txtCritere.value = ''
+  libelleListe.value = 'choix adresses (0)'
+  adressesListeSelect.value = []
   adressesListeChoisi.value = [] 
 }
 

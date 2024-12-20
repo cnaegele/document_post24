@@ -539,6 +539,7 @@
         <v-card-text>
             <div>
                 <ObjetChoix
+                    modeChoix="unique"
                     @choixObjet="receptionObjet">
                 </ObjetChoix>
             </div>
@@ -1161,10 +1162,15 @@ const closeCardObjetChoix = () => {
 
 const receptionObjet = (idObjet, jsonData) => {
     //console.log(jsonData)
-    const oObjet = JSON.parse(jsonData)
-    console.log(oObjet)
-    //todo traiter le retour objet...
-     closeCardObjetChoix()
+    if (idObjet > 0) {
+        ajoutObjetLie(idObjet)
+    } else {
+        const aoObjet = JSON.parse(jsonData)
+        for (let i=0; i<aoObjet.length; i++) {
+            ajoutObjetLie(aoObjet[i].id)
+        }
+    }
+    closeCardObjetChoix()
 }
 
 const choixEmployesDroitConsultation = (modeChoix) => {
