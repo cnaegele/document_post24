@@ -114,7 +114,7 @@
 <script setup>
 import {ref} from 'vue'
 import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
-import { parcelleListeParAdresse } from '@/axioscalls_objet.js'
+import { batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
 
 const props = defineProps({
   modeChoix: String,
@@ -157,10 +157,20 @@ const receptionAdresse = async (idadresse, jsonData) => {
     }
     //console.log(aoAdresse)
     for (let i=0; i<aoAdresse.length; i++) {
-      const oCritere = {
+      const oCritereBatiment = {
         "idadresse" : aoAdresse[i].idadresse,
       }
-      const parcellesListe = await parcelleListeParAdresse(JSON.stringify(oCritere))
+      const batimentsListe = await batimentListeParAdresse(JSON.stringify(oCritereBatiment))
+      //console.log(batimentsListe)
+      for (let ib=0; ib<batimentsListe.length; ib++) {
+        const objet = {"id" : batimentsListe[ib].idobjet, "nom" : batimentsListe[ib].nomobjet}
+        choixObjet(objet)
+      }
+
+      const oCritereParcelle = {
+        "idadresse" : aoAdresse[i].idadresse,
+      }
+      const parcellesListe = await parcelleListeParAdresse(JSON.stringify(oCritereParcelle))
       //console.log(parcellesListe)
       for (let ip=0; ip<parcellesListe.length; ip++) {
         const objet = {"id" : parcellesListe[ip].idobjet, "nom" : parcellesListe[ip].nomobjet}

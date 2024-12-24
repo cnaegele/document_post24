@@ -35,6 +35,21 @@ export async function parcelleListeParAdresse(jsonCriteres) {
     return response.data
 }
 
+export async function batimentListeParAdresse(jsonCriteres) {
+    /**
+     * jsonCritere :
+     * idadresse : identifian de l'adresse
+     * baannexe (optionnel def 1) : 1 retourne les éventuels bâtiments annexes / 0 uniquement le bâtiment avec l'adresse
+     */
+    const urlbaa = `${g_devurl}${g_pathurlbatiment}batiment_liste_paradresse.php`
+    const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
+    const response = await axios.get(urlbaa, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
 function traiteAxiosError(error) {
     if (error.response) {
         return `${error.response.data}<br>${error.response.status}<br>${error.response.headers}`    

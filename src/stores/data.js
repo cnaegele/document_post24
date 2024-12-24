@@ -5,7 +5,7 @@ export const storedatadoc = defineStore({
     state: () => ({
         env: {
             version: ref('1.0.4'),
-            dateversion: ref('13.12.2024'),
+            dateversion: ref('24.12.2024'),
         },
         file: ref(null),
         filemd5: ref(''),

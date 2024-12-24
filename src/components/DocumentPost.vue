@@ -698,6 +698,7 @@ const {auteuremploye} = toRefs(props)
 const {auteursacteur} = toRefs(props)
 //objetslies, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
 const { objetslies } = toRefs(props)
+let bCardChoixObjetOpen = false
 const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
@@ -1118,7 +1119,10 @@ const ajoutObjetLie = async (idObjetPrm) => {
     }
     if (idObjetPrm === "") {
         //inpIdObjetLieAjout.value.$el.querySelector('input').focus()
-        document.getElementById("btnActiveCardChoixObjet").click()    
+        if (!bCardChoixObjetOpen) {
+            bCardChoixObjetOpen = true
+            document.getElementById("btnActiveCardChoixObjet").click()
+        }    
     } else {
         if (/^\+?(0|[1-9]\d*)$/.test(idObjetPrm)) {
             if (idObjetPrm > 0 && idObjetPrm <= 999999999) {
@@ -1157,7 +1161,10 @@ const supprimeLienObjet = (index) => {
 }
 
 const closeCardObjetChoix = () => {
-  document.getElementById("btnActiveCardChoixObjet").click()    
+    if (bCardChoixObjetOpen) {
+        bCardChoixObjetOpen = false
+        document.getElementById("btnActiveCardChoixObjet").click()
+    }    
 }
 
 const receptionObjet = (idObjet, jsonData) => {
