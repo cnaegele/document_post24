@@ -528,7 +528,7 @@
     <template v-slot:default="isActive">
       <v-card>
         <v-card-actions>
-          <span class="cardTitre"><h3>Choix d'un objet</h3> (cliquez sur le nom pour sélectionner)<br>développement en cours, pas utilisable, ci-dessous choix adresse qui sera dans le futur choix objet, option [parcelle et bâtiment par adresse]</span>
+          <span class="cardTitre"><h3>Choix d'un objet</h3> (cliquez sur le nom pour sélectionner)</span>
           <v-spacer></v-spacer>
           <v-btn
             text="Fermer"
@@ -698,7 +698,7 @@ const {auteuremploye} = toRefs(props)
 const {auteursacteur} = toRefs(props)
 //objetslies, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
 const { objetslies } = toRefs(props)
-let bCardChoixObjetOpen = false
+let bCardChoixObjetToClose = false
 const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
 const { sizemax } = toRefs(props)
@@ -885,7 +885,7 @@ watch(() => oFamille.value, (newValueoF, oldValueoF) => {
                 lesDatas.messagesErreur.timeOutSnackbar = 10000
                 lesDatas.messagesErreur.bSnackbar = true
                 lesDatas.messagesErreur.messageSnackbar = `L'extension du fichier (.${fileExtension}) n'est pas prévue pour cette famille de document`
-        }    
+            }    
         }
 
         //Selon configuration familletitre "avant" ou "apres" on modifie le titre du document
@@ -1118,11 +1118,8 @@ const ajoutObjetLie = async (idObjetPrm) => {
         idObjetPrm = idObjetLieAjout.value.trim()
     }
     if (idObjetPrm === "") {
-        //inpIdObjetLieAjout.value.$el.querySelector('input').focus()
-        if (!bCardChoixObjetOpen) {
-            bCardChoixObjetOpen = true
-            document.getElementById("btnActiveCardChoixObjet").click()
-        }    
+        bCardChoixObjetToClose = true
+        document.getElementById("btnActiveCardChoixObjet").click()     
     } else {
         if (/^\+?(0|[1-9]\d*)$/.test(idObjetPrm)) {
             if (idObjetPrm > 0 && idObjetPrm <= 999999999) {
@@ -1161,8 +1158,8 @@ const supprimeLienObjet = (index) => {
 }
 
 const closeCardObjetChoix = () => {
-    if (bCardChoixObjetOpen) {
-        bCardChoixObjetOpen = false
+    if (bCardChoixObjetToClose) {
+        bCardChoixObjetToClose = false
         document.getElementById("btnActiveCardChoixObjet").click()
     }    
 }

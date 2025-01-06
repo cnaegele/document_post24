@@ -14,7 +14,23 @@
       <v-card-text>
         <v-tabs-window v-model="tabchoisi">
           <v-tabs-window-item value="batiment">
-            Bâtiments...
+            <div class="d-flex align-items-baseline">
+              <span class="me-2 mt-3">critère selon :</span>
+              <v-radio-group v-model="typeCritereBatiment" inline>
+                <v-radio label="nom" value="nom"></v-radio>
+                <v-radio label="n° ECA" value="eca"></v-radio>
+                <v-radio label="egid" value="egid"></v-radio>
+              </v-radio-group>            
+            </div>  
+            <v-text-field
+                dense
+                v-model="critereBatiment"
+                ref="inpTxtCritereBatiment"
+                :label="libelleInpCritereBatiment"
+                style="width: 400px;"
+                :rules="critereBatimentRule"
+                @input="onInputCritereBatiment"
+              ></v-text-field> 
           </v-tabs-window-item>
   
           <v-tabs-window-item value="parcelle">
@@ -26,7 +42,19 @@
           </v-tabs-window-item>
 
           <v-tabs-window-item value="bpadresse">
-            sélection d'une adresse
+            <div class="d-flex align-center">
+              <span class="me-4"><h3>Sélection d'une adresse</h3></span>
+              <v-radio-group
+                label="retour"
+                v-model="retourParAdresseType"
+                inline
+                density="compact">
+                <v-radio label="bâtiment et parcelle" :value="'batpar'"></v-radio>&nbsp;&nbsp;
+                <v-radio label="bâtiment" :value="'bat'"></v-radio>&nbsp;&nbsp;
+                <v-radio label="parcelle" :value="'par'"></v-radio>&nbsp;&nbsp;
+              </v-radio-group> 
+            </div> 
+
             <div>
                 <AdresseChoix 
                     critereTypeInit="nom"
@@ -112,15 +140,62 @@
   </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
 import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
-import { batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
+import { batimentListe, batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
 
 const props = defineProps({
+  nombreMaximumRetour: String,
   modeChoix: String,
 })
 
 const tabchoisi = ref(null)
+const typeCritereBatiment = ref('nom')
+const critereBatiment = ref('')
+let bCritereBatimentEgidOK = true
+const libelleInpCritereBatiment = ref('nom bâtiment')
+const inpTxtCritereBatiment = ref(null)
+const retourParAdresseType = ref('batpar')
+
+watch(() => typeCritereBatiment.value, () => {
+  switch (typeCritereBatiment.value) {
+    case 'nom':
+      libelleInpCritereBatiment.value = 'nom bâtiment'
+      break
+    case 'eca':
+      libelleInpCritereBatiment.value = 'n° ECA'
+      break
+    case 'egid':
+      libelleInpCritereBatiment.value = 'egid'
+      inpTxtCritereBatiment.value.validate()
+      break
+  }
+  prepareRechercheBatiments()
+})
+
+const critereBatimentRule = [
+    value => {
+      if (value !== '') {
+        if (typeCritereBatiment.value == 'egid') {
+          if (/^\+?(0|[1-9]\d*)$/.test(value) === false) {
+            bCritereBatimentEgidOK = false
+            return `l'egid doit être numérique`
+          }
+          if (value <= 0 || value > 9999999999) {
+            bCritereBatimentEgidOK = false
+            return `l'egid doit être positif et 10 chiffres au maximum`
+          }
+        }
+      }
+      bCritereBatimentEgidOK = true
+      return true
+    }
+]
+
+let nombreMaximumRetour = ref(100)
+if (props.nombreMaximumRetour !== undefined) {
+  nombreMaximumRetour = ref(props.nombreMaximumRetour)
+}
 
 let modeChoix = ref('unique')
 if (props.modeChoix !== undefined) {
@@ -146,6 +221,65 @@ const choixObjet = (objet) => {
   }
 }
 
+//pour démarrer la recherche seulement si la frappe au clavier a cessé depuis 0.7 secondes
+let typingTimer
+const typingInterval = 700
+const onInputCritereBatiment = () => {
+  //console.log('oninput')
+  clearTimeout(typingTimer)
+  
+  typingTimer = setTimeout(() => {
+    prepareRechercheBatiments()
+  }, typingInterval)
+
+  inpTxtCritereBatiment.value.$el.querySelector('input').focus()
+}
+
+const prepareRechercheBatiments = () => {
+  const critereBat = critereBatiment.value.trim()
+  if (critereBat !== '') {
+    switch (typeCritereBatiment.value) {
+      case 'nom':
+        if (critereBat.length >= 3) {
+          rechercheBatiments('nom', critereBat)  
+        }
+        break
+      case 'eca':
+        rechercheBatiments('eca', critereBat)  
+      break
+      case 'egid':
+        if (bCritereBatimentEgidOK) {
+          rechercheBatiments('egid', critereBat)
+        }
+        break
+    }
+    //console.log('prepareRechercheBatiments')
+  }
+}
+const rechercheBatiments = async (crType, critere) => {
+  const oCritere = {
+    "crtype" : crType,
+    "critere" : critere,
+    "nombremaximumretour" : nombreMaximumRetour.value
+  }
+  console.log (JSON.stringify(oCritere))
+  let objetsListe = await batimentListe(JSON.stringify(oCritere))
+  //console.log(objetsListe)
+  if (objetsListe.hasOwnProperty('message')) {
+      messageErreur.value += objetsListe.message + '<br>'
+      objetsListe = []
+  }
+  if (objetsListe.length < nombreMaximumRetour.value) {
+      libelleListe.value = `Choix bâtiments (${objetsListe.length})`
+  } else {
+      libelleListe.value = `Choix bâtiments (${objetsListe.length}). Attention, plus de ${nombreMaximumRetour.value} bâtiments correspondent aux critères`
+  }
+    objetsListeSelect.value = objetsListe
+}
+
+
+
+
 const receptionAdresse = async (idadresse, jsonData) => {
     //console.log(jsonData)
     const oAdresse = JSON.parse(jsonData)
@@ -157,24 +291,28 @@ const receptionAdresse = async (idadresse, jsonData) => {
     }
     //console.log(aoAdresse)
     for (let i=0; i<aoAdresse.length; i++) {
-      const oCritereBatiment = {
-        "idadresse" : aoAdresse[i].idadresse,
-      }
-      const batimentsListe = await batimentListeParAdresse(JSON.stringify(oCritereBatiment))
-      //console.log(batimentsListe)
-      for (let ib=0; ib<batimentsListe.length; ib++) {
-        const objet = {"id" : batimentsListe[ib].idobjet, "nom" : batimentsListe[ib].nomobjet}
-        choixObjet(objet)
+      if (retourParAdresseType.value == 'batpar' || retourParAdresseType.value == 'bat') {
+        const oCritereBatiment = {
+          "idadresse" : aoAdresse[i].idadresse,
+        }
+        const batimentsListe = await batimentListeParAdresse(JSON.stringify(oCritereBatiment))
+        //console.log(batimentsListe)
+        for (let ib=0; ib<batimentsListe.length; ib++) {
+          const objet = {"id" : batimentsListe[ib].idobjet, "nom" : batimentsListe[ib].nomobjet}
+          choixObjet(objet)
+        }
       }
 
-      const oCritereParcelle = {
-        "idadresse" : aoAdresse[i].idadresse,
-      }
-      const parcellesListe = await parcelleListeParAdresse(JSON.stringify(oCritereParcelle))
-      //console.log(parcellesListe)
-      for (let ip=0; ip<parcellesListe.length; ip++) {
-        const objet = {"id" : parcellesListe[ip].idobjet, "nom" : parcellesListe[ip].nomobjet}
-        choixObjet(objet)
+      if (retourParAdresseType.value == 'batpar' || retourParAdresseType.value == 'par') {
+        const oCritereParcelle = {
+          "idadresse" : aoAdresse[i].idadresse,
+        }
+        const parcellesListe = await parcelleListeParAdresse(JSON.stringify(oCritereParcelle))
+        //console.log(parcellesListe)
+        for (let ip=0; ip<parcellesListe.length; ip++) {
+          const objet = {"id" : parcellesListe[ip].idobjet, "nom" : parcellesListe[ip].nomobjet}
+          choixObjet(objet)
+        }
       }
     }
 }

@@ -16,19 +16,17 @@ export async function objetInfoParId(idObjet) {
         })
     return response.data
 }
-export async function parcelleListeParAdresse(jsonCriteres) {
+
+export async function batimentListe(jsonCriteres) {
     /**
      * jsonCritere :
-     * idadresse : identifian de l'adresse
-     * bactif (optionnel def 1) : 1 uniquement parcelles "active" / 0 avec parcelle inactive (radiée)
-     * bstandard (optionnel def 1) : 1 retour parcelles standard / 0 pas de parcelle standard
-     * bddp (optionnel def 1) : 1 retour parcelles DDP / 0 pas de DDP
-     * bppe (optionnel def 1) : 1 retour des parcelles PPE / 0 pas de PPE
-     * bcopr (optionnel def 1) : 1 retour des parcelles Copropriété / 0 pas de Copropriété
+     * crtype : type de critère. nom: recherche par nom  eca: recherche par n° ECA  egid: recherche par egid
+     * critere
+     * nombremaximumretour : nombre maximun de bâtiments retournés
      */
-    const urlpla = `${g_devurl}${g_pathurlparcelle}parcelle_liste_paradresse.php`
+    const urlbal = `${g_devurl}${g_pathurlbatiment}batiment_liste.php`
     const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
-    const response = await axios.get(urlpla, { params })
+    const response = await axios.get(urlbal, { params })
         .catch(function (error) {
             return traiteAxiosError(error)
         })
@@ -44,6 +42,25 @@ export async function batimentListeParAdresse(jsonCriteres) {
     const urlbaa = `${g_devurl}${g_pathurlbatiment}batiment_liste_paradresse.php`
     const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
     const response = await axios.get(urlbaa, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
+export async function parcelleListeParAdresse(jsonCriteres) {
+    /**
+     * jsonCritere :
+     * idadresse : identifian de l'adresse
+     * bactif (optionnel def 1) : 1 uniquement parcelles "active" / 0 avec parcelle inactive (radiée)
+     * bstandard (optionnel def 1) : 1 retour parcelles standard / 0 pas de parcelle standard
+     * bddp (optionnel def 1) : 1 retour parcelles DDP / 0 pas de DDP
+     * bppe (optionnel def 1) : 1 retour des parcelles PPE / 0 pas de PPE
+     * bcopr (optionnel def 1) : 1 retour des parcelles Copropriété / 0 pas de Copropriété
+     */
+    const urlpla = `${g_devurl}${g_pathurlparcelle}parcelle_liste_paradresse.php`
+    const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
+    const response = await axios.get(urlpla, { params })
         .catch(function (error) {
             return traiteAxiosError(error)
         })
