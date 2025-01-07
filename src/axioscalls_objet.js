@@ -33,6 +33,22 @@ export async function batimentListe(jsonCriteres) {
     return response.data
 }
 
+export async function parcelleListe(jsonCriteres) {
+    /**
+     * jsonCritere :
+     * crtype : type de critère. numero: recherche par numero  eca: recherche par n° ECA  egrid: recherche par egrid
+     * critere
+     * nombremaximumretour : nombre maximun de bâtiments retournés
+     */
+    const urlpal = `${g_devurl}${g_pathurlparcelle}parcelle_liste.php`
+    const params = new URLSearchParams([['jsoncriteres', jsonCriteres]])
+    const response = await axios.get(urlpal, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
 export async function batimentListeParAdresse(jsonCriteres) {
     /**
      * jsonCritere :

@@ -34,7 +34,23 @@
           </v-tabs-window-item>
   
           <v-tabs-window-item value="parcelle">
-            Parcelles...
+            <div class="d-flex align-items-baseline">
+              <span class="me-2 mt-3">critère selon :</span>
+              <v-radio-group v-model="typeCritereParcelle" inline>
+                <v-radio label="n° parcelle" value="numero"></v-radio>
+                <v-radio label="n° ECA" value="eca"></v-radio>
+                <v-radio label="egrid" value="egrid"></v-radio>
+              </v-radio-group>            
+            </div>  
+            <v-text-field
+                dense
+                v-model="critereParcelle"
+                ref="inpTxtCritereParcelle"
+                :label="libelleInpCritereParcelle"
+                style="width: 180px;"
+                :rules="critereParcelleRule"
+                @input="onInputCritereParcelle"
+              ></v-text-field> 
           </v-tabs-window-item>
   
           <v-tabs-window-item value="rue">
@@ -142,7 +158,7 @@
 <script setup>
 import {ref, watch} from 'vue'
 import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
-import { batimentListe, batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
+import { batimentListe, parcelleListe, batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
 
 const props = defineProps({
   nombreMaximumRetour: String,
@@ -155,6 +171,11 @@ const critereBatiment = ref('')
 let bCritereBatimentEgidOK = true
 const libelleInpCritereBatiment = ref('nom bâtiment')
 const inpTxtCritereBatiment = ref(null)
+const typeCritereParcelle = ref('numero')
+const critereParcelle = ref('')
+let bCritereParcelleEgridOK = true
+const libelleInpCritereParcelle = ref('n° parcelle')
+const inpTxtCritereParcelle = ref(null)
 const retourParAdresseType = ref('batpar')
 
 watch(() => typeCritereBatiment.value, () => {
@@ -191,6 +212,38 @@ const critereBatimentRule = [
       return true
     }
 ]
+
+watch(() => typeCritereParcelle.value, () => {
+  switch (typeCritereParcelle.value) {
+    case 'numero':
+      libelleInpCritereParcelle.value = 'n° parcelle'
+      break
+    case 'eca':
+      libelleInpCritereParcelle.value = 'n° ECA'
+      break
+    case 'egrid':
+      libelleInpCritereParcelle.value = 'egrid'
+      inpTxtCritereParcelle.value.validate()
+      break
+  }
+  prepareRechercheParcelles()
+})
+
+const critereParcelleRule = [
+    value => {
+      if (value !== '') {
+        if (typeCritereParcelle.value == 'egrid') {
+          if (/^ch(0|[1-9]\d*)[\*]?$/i.test(value) === false) {
+            bCritereParcelleEgridOK = false
+            return `l'egrid doit être de la forme CH{numérique}`
+          }
+        }
+      }
+      bCritereParcelleEgridOK = true
+      return true
+    }
+]
+
 
 let nombreMaximumRetour = ref(100)
 if (props.nombreMaximumRetour !== undefined) {
@@ -274,11 +327,59 @@ const rechercheBatiments = async (crType, critere) => {
   } else {
       libelleListe.value = `Choix bâtiments (${objetsListe.length}). Attention, plus de ${nombreMaximumRetour.value} bâtiments correspondent aux critères`
   }
-    objetsListeSelect.value = objetsListe
+  objetsListeSelect.value = objetsListe
 }
 
+const onInputCritereParcelle = () => {
+  //console.log('oninput')
+  clearTimeout(typingTimer)
+  
+  typingTimer = setTimeout(() => {
+    prepareRechercheParcelles()
+  }, typingInterval)
 
+  inpTxtCritereParcelle.value.$el.querySelector('input').focus()
+}
 
+const prepareRechercheParcelles = () => {
+  const criterePar = critereParcelle.value.trim()
+  if (criterePar !== '') {
+    switch (typeCritereParcelle.value) {
+      case 'numero':  
+        rechercheParcelles('numero', criterePar)  
+        break
+      case 'eca':
+        rechercheParcelles('eca', criterePar)  
+      break
+      case 'egrid':
+        if (bCritereParcelleEgridOK) {
+          rechercheParcelles('egrid', criterePar)
+        }
+        break
+    }
+    //console.log('prepareRechercheParcelles')
+  }
+}
+const rechercheParcelles = async (crType, critere) => {
+  const oCritere = {
+    "crtype" : crType,
+    "critere" : critere,
+    "nombremaximumretour" : nombreMaximumRetour.value
+  }
+  //console.log (JSON.stringify(oCritere))
+  let objetsListe = await parcelleListe(JSON.stringify(oCritere))
+  //console.log(objetsListe)
+  if (objetsListe.hasOwnProperty('message')) {
+      messageErreur.value += objetsListe.message + '<br>'
+      objetsListe = []
+  }
+  if (objetsListe.length < nombreMaximumRetour.value) {
+      libelleListe.value = `Choix parcelles (${objetsListe.length})`
+  } else {
+      libelleListe.value = `Choix parcelles (${objetsListe.length}). Attention, plus de ${nombreMaximumRetour.value} parcelles correspondent aux critères`
+  }
+  objetsListeSelect.value = objetsListe
+}
 
 const receptionAdresse = async (idadresse, jsonData) => {
     //console.log(jsonData)
