@@ -214,13 +214,26 @@
                 <v-expansion-panel-title>
                     <span  class="d-flex">
                     <span class="titreChampSaisie">Objets liés&nbsp;&nbsp;</span>
-                        <v-tooltip text="ajouter un objet lié">
+                    <v-tooltip text="ajouter un objet lié">
                             <template v-slot:activator="{ props }">
                                 <v-btn
                                     v-bind="props"
+                                    size="small"
                                     rounded="lg"
-                                    @click.stop="ajoutObjetLie()"
-                                >+</v-btn>
+                                    @click.stop="demandeChoixObjetLie('unique')"
+                                >+1</v-btn>
+                            </template>        
+                        </v-tooltip>
+                        &nbsp;
+                        <v-tooltip text="ajouter plusieurs objets liés">
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    size="small"
+                                    rounded="lg"
+                                    class="text-none"
+                                    @click.stop="demandeChoixObjetLie('multiple')"
+                                >+n</v-btn>
                             </template>        
                         </v-tooltip>
                         &nbsp;&nbsp;
@@ -251,7 +264,7 @@
                                 </v-tooltip>
                             </v-col>
                             <v-col cols="12" md="3">
-                            {{ objetlie.type }}
+                                {{ objetlie.type }}
                             </v-col>
                             <v-col cols="12" md="8">
                                 {{ objetlie.nom }}
@@ -539,7 +552,7 @@
         <v-card-text>
             <div>
                 <ObjetChoix
-                    modeChoix="unique"
+                    :modeChoix="modeChoixObjet"
                     @choixObjet="receptionObjet">
                 </ObjetChoix>
             </div>
@@ -751,6 +764,7 @@ const panelDroitsConsultation = ref([])
 const modeChoixEmployeDC = ref('unique')
 const modeChoixUniteOrgDC = ref('unique')
 const modeChoixGroupeSecuriteDC = ref('unique')
+const modeChoixObjet = ref('unique')
 
 const messageLog = ref('')
 
@@ -1111,6 +1125,11 @@ const supprimeActeurAuteur = (idacteur) => {
             }
         }       
     }
+}
+
+const demandeChoixObjetLie = (modeChoix) => {
+    modeChoixObjet.value = modeChoix
+    ajoutObjetLie()    
 }
 
 const ajoutObjetLie = async (idObjetPrm) => {

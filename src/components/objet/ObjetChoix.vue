@@ -136,18 +136,16 @@
               :title="objet.nom"
               @click="choixObjet(objet)"
             >
-              <!--
               <template v-slot:append>
                 <v-btn
                   color="grey-lighten-1"
-                  icon="mdi-map-outline"
+                  icon="mdi-information"
                   variant="text"
                   @mouseenter="infoMouseEnter()"
                   @mouseleave="infoMouseLeave()"
-                  @click="openGC(adresse.coordeo, adresse.coordsn)"
+                  @click="openFicheObjet(objet.id)"
                 ></v-btn>
               </template>
-              -->
             </v-list-item>
           </v-list>
         </v-col>  
@@ -424,13 +422,16 @@ const supprimeChoix = (idobjet) => {
 
 const choixTermine = () => {
   emit('choixObjet', 0, JSON.stringify(objetsListeChoisi.value))
-  objetsListeChoisi.value = [] 
+  objetsListeChoisi.value = []
 }
 
 const infoMouseEnter = () => {
-  demandeOpenGC = true
+  demandeObjetInfo = true
 }
 const infoMouseLeave = () => {
-  demandeOpenGC = false
+  demandeObjetInfo = false
+}
+const openFicheObjet = (idobjet) => {
+  window.open(`https://golux.lausanne.ch/goeland/objet/getobjetinfo.php?idObjet=${idobjet}`, "goobjetinfo")
 }
 </script>
