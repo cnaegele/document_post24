@@ -6,6 +6,7 @@ if (import.meta.env.DEV) {
 const g_pathurlobjet = '/goeland/objet/axios/'
 const g_pathurlparcelle = '/goeland/parcelle/axios/'
 const g_pathurlbatiment = '/goeland/batiment/axios/'
+const g_pathurlrue = '/goeland/rue/ajax/'
 
 export async function objetInfoParId(idObjet) {
     const urloi = `${g_devurl}${g_pathurlobjet}objet_information_parid.php`
@@ -81,6 +82,15 @@ export async function parcelleListeParAdresse(jsonCriteres) {
             return traiteAxiosError(error)
         })
     return response.data
+}
+
+export async function ruesListe() {
+    const urlrl = `${g_devurl}${g_pathurlrue}rues_noms_liste.php`
+    const response = await axios.get(urlrl)
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+        return response.data
 }
 
 function traiteAxiosError(error) {

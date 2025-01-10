@@ -54,7 +54,12 @@
           </v-tabs-window-item>
   
           <v-tabs-window-item value="rue">
-            Rues...
+            <v-autocomplete
+                v-model="idThingRueChoisie"
+                label="Choix rue"
+                :items="ruesListeChoix"
+                :custom-filter="ruesCustomFilter"
+            ></v-autocomplete>
           </v-tabs-window-item>
 
           <v-tabs-window-item value="bpadresse">
@@ -83,6 +88,7 @@
 
           <v-tabs-window-item value="autre">
             Autres objets...
+            Pas encore implémenté mais on peut lier un objet si on connait son id [+1] [......]
           </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>
@@ -156,7 +162,7 @@
 <script setup>
 import {ref, watch} from 'vue'
 import AdresseChoix from '@/components/adresse/AdresseChoix.vue'
-import { batimentListe, parcelleListe, batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
+import { batimentListe, parcelleListe, ruesListe, batimentListeParAdresse, parcelleListeParAdresse } from '@/axioscalls_objet.js'
 
 const props = defineProps({
   nombreMaximumRetour: String,
@@ -174,7 +180,44 @@ const critereParcelle = ref('')
 let bCritereParcelleEgridOK = true
 const libelleInpCritereParcelle = ref('n° parcelle')
 const inpTxtCritereParcelle = ref(null)
+const idThingRueChoisie = ref('')
+const ruesListeChoix = ref([])
 const retourParAdresseType = ref('batpar')
+
+
+//Choix de rue(s), toutes les rues sont chargées dans un v-autocomplete
+watch (() => tabchoisi.value, () => {
+  if (tabchoisi.value == 'rue' && ruesListeChoix.value.length == 0) {
+    initRuesListe()  
+  }
+  libelleListe.value = ''
+})
+
+function ruesCustomFilter(itemTitle, queryText, item) {
+  const removeAccents = str =>
+        str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const textLowerCase = item.raw.title.toLowerCase()
+  const searchTextLowerCase = queryText.toLowerCase()
+  const textUnAccent = removeAccents(item.raw.title.toLowerCase())
+  const searchTextUnAccent = removeAccents(queryText.toLowerCase())
+  return textLowerCase.indexOf(searchTextLowerCase) > -1
+    || textUnAccent.indexOf(searchTextUnAccent) > -1
+}
+
+const initRuesListe = async () => {
+  ruesListeChoix.value = await ruesListe()
+  //console.log(ruesListeChoix.value)
+}
+
+watch (() => idThingRueChoisie.value, () => {
+  const rueChoisie = ruesListeChoix.value.find(rue => rue.value === idThingRueChoisie.value)
+  const objet = {
+    "id" : rueChoisie.value,
+    "nom" : rueChoisie.title
+  }
+  choixObjet(objet)
+})
+//Fin code pour choix des rues
 
 watch(() => typeCritereBatiment.value, () => {
   switch (typeCritereBatiment.value) {
