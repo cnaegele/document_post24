@@ -33,6 +33,19 @@ export const storedatadoc = defineStore({
                 type: ref(''),
                 nom: ref('')
             */
+            documentsLies: ref([]),
+            /*
+                id: ref(0),
+                idTypeLien : ref(0),
+                nom: ref(''),
+                typeLien: ref('')
+            */
+            affairesLiees: ref([]),
+            /*
+                id: ref(0),
+                type: ref(''),
+                nom: ref(''),
+            */
             idNiveauConfidentialite: ref('1'),
             employesDroitConsultation: ref([]),
             /*

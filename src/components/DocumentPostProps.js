@@ -143,6 +143,30 @@ export const documentPostProps = {
         return []
       }
     },
+    documentsliesedit: {
+      type: String,
+      default() {
+        return 'oui'
+      }
+    },
+    documentslies: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    affaireslieesedit: {
+      type: String,
+      default() {
+        return 'non'
+      }
+    },
+    affairesliees: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
     idniveauconfidentialite: {
       type: String,
       default() {

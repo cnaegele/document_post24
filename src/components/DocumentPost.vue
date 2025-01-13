@@ -276,6 +276,120 @@
             </v-expansion-panels>    
         </v-col>
     </v-row>
+    <v-row dense v-if="documentsliesedit == 'oui'">
+        <v-col>
+            <v-expansion-panels v-model="panelDocumentsLies">
+            <v-expansion-panel>
+                <v-expansion-panel-title>
+                    <span  class="d-flex">
+                    <span class="titreChampSaisie">Documents liés&nbsp;&nbsp;</span>
+                    <v-tooltip text="ajouter un document lié">
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    size="small"
+                                    rounded="lg"
+                                    @click.stop="ajoutDocumentLie()"
+                                >+</v-btn>
+                            </template>        
+                        </v-tooltip>
+                        &nbsp;&nbsp;
+                        <v-text-field
+                            dense
+                            v-model="idDocumentLieAjout"
+                            ref="inpIdDocumentLieAjout"
+                            label="id document"
+                            :rules="documentLieAjoutRule"
+                            style="width: 200px;"
+                            @click.stop
+                        ></v-text-field> 
+                    </span>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>  
+                    <v-container>
+                        <v-row dense v-for="(documentlie, index) in lesDatas.document.documentsLies" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le lien document">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeLienDocument(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                {{ documentlie.nom }}
+                            </v-col>
+                            <v-col cols="12" md="8">
+                                {{ documentlie.typelien }}
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+            </v-expansion-panels>    
+        </v-col>
+    </v-row>
+    <v-row dense v-if="affaireslieesedit == 'oui'">
+        <v-col>
+            <v-expansion-panels v-model="panelAffairesLiees">
+            <v-expansion-panel>
+                <v-expansion-panel-title>
+                    <span  class="d-flex">
+                    <span class="titreChampSaisie">Affaires liées&nbsp;&nbsp;</span>
+                    <v-tooltip text="ajouter une affaire liée">
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    size="small"
+                                    rounded="lg"
+                                    @click.stop="ajoutAffaireLiee()"
+                                >+</v-btn>
+                            </template>        
+                        </v-tooltip>
+                        &nbsp;&nbsp;
+                        <v-text-field
+                            dense
+                            v-model="idAffaireLieeAjout"
+                            ref="inpIdAffaireLieeAjout"
+                            label="id affaire"
+                            :rules="affaireLieeAjoutRule"
+                            style="width: 200px;"
+                            @click.stop
+                        ></v-text-field> 
+                    </span>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>  
+                    <v-container>
+                        <v-row dense v-for="(affaireliee, index) in lesDatas.document.affairesLiees" :key="index" class="d-flex align-center">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="supprimer le lien affaire">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-delete"
+                                        variant="text"
+                                        @click="supprimeLienAffaire(index)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                {{ affaireliee.nom }}
+                            </v-col>
+                            <v-col cols="12" md="8">
+                                {{ affaireliee.type }}
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+            </v-expansion-panels>    
+        </v-col>
+    </v-row>
     <v-row dense>
       <v-col cols="12" md="2" class="titreChampSaisie">Niveau de confidentialité</v-col>
         <v-col cols="12" md="5">
@@ -711,6 +825,11 @@ const {auteuremploye} = toRefs(props)
 const {auteursacteur} = toRefs(props)
 //objetslies, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
 const { objetslies } = toRefs(props)
+//documentslies, traitement special dans onmounted pour récupérer pour l'affichage nom selon le id
+const { documentsliesedit } = toRefs(props)
+//affairesliess, traitement special dans onmounted pour récupérer pour l'affichage type et nom selon le id
+const { affaireslieesedit } = toRefs(props)
+
 let bCardChoixObjetToClose = false
 const { idniveauconfidentialite } = toRefs(props)
 lesDatas.document.idNiveauConfidentialite = idniveauconfidentialite.value
@@ -759,6 +878,12 @@ const messagesErreurDateOfficielle = ref('la date officielle est obligatoire ou 
 const panelObjetsLies = ref([])
 const idObjetLieAjout = ref('')
 const inpIdObjetLieAjout = ref(null)
+const panelDocumentsLies = ref([])
+const idDocumentLieAjout = ref('')
+const inpIdDocumentLieAjout = ref(null)
+const panelAffairesLiees = ref([])
+const idAffaireLieeAjout = ref('')
+const inpIdAffaireLieeAjout = ref(null)
 
 const panelDroitsConsultation = ref([])
 const modeChoixEmployeDC = ref('unique')
@@ -815,6 +940,40 @@ const objetLieAjoutRule = [
             }
         } else {
             return "l'id objet est invalide."
+        }
+    }
+]
+
+const documentLieAjoutRule = [
+    value => {
+        if (value === '') {
+            return true
+        }
+        if (/^\+?(0|[1-9]\d*)$/.test(value)) {
+            if (value > 0 && value <= 999999999) {
+                return true
+            } else {
+                return "l'id document est invalide > 999999999"
+            }
+        } else {
+            return "l'id document est invalide."
+        }
+    }
+]
+
+const affaireLieeAjoutRule = [
+    value => {
+        if (value === '') {
+            return true
+        }
+        if (/^\+?(0|[1-9]\d*)$/.test(value)) {
+            if (value > 0 && value <= 999999999) {
+                return true
+            } else {
+                return "l'id affaire est invalide > 999999999"
+            }
+        } else {
+            return "l'id affaire est invalide."
         }
     }
 ]
@@ -1196,6 +1355,94 @@ const receptionObjet = (idObjet, jsonData) => {
     closeCardObjetChoix()
 }
 
+const ajoutDocumentLie = async (idDocumentPrm) => {
+    if (idDocumentPrm == undefined) {
+        idDocumentPrm = idDocumentLieAjout.value.trim()
+    }
+    if (idDocumentPrm !== "") {
+        if (/^\+?(0|[1-9]\d*)$/.test(idDocumentPrm)) {
+            if (idDocumentPrm > 0 && idDocumentPrm <= 999999999) {
+                //On regarde si ce document est déjà dans les documents liés
+                panelDocumentsLies.value = [0]
+                let bTrouve = false
+                for (let i=0; i<lesDatas.document.documentsLies.length; i++) {
+                    if (lesDatas.document.documentsLies[i].id == idDocumentPrm) {
+                        bTrouve = true
+                        break
+                    }
+                }
+                if (!bTrouve) {
+                    console.log(`go glèglè pour lier le document ' ${idDocumentPrm}`)
+                    /*
+                    const objetInfo = await objetInfoParId(idObjetPrm)
+                    if (objetInfo.length == 1) {
+                        const oObjetLiePlus = {
+                            "id": objetInfo[0].id,
+                            "type": objetInfo[0].type,
+                            "nom": objetInfo[0].nom,
+                        }
+                        lesDatas.document.objetsLies.push(oObjetLiePlus)
+                        idObjetLieAjout.value = ''
+                    } else {
+                        lesDatas.messagesErreur.timeOutSnackbar = 10000
+                        lesDatas.messagesErreur.bSnackbar = true
+                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjetPrm} n'existe pas`
+                    }
+                    */
+                }    
+            }
+        }        
+    }
+}
+
+const supprimeLienDocument = (index) => {
+    lesDatas.document.documentsLies.splice(index, 1)
+}
+
+const ajoutAffaireLiee = async (idAffairePrm) => {
+    if (idAffairePrm == undefined) {
+        idAffairePrm = idAffaireLieeAjout.value.trim()
+    }
+    if (idAffairePrm !== "") {
+        if (/^\+?(0|[1-9]\d*)$/.test(idAffairePrm)) {
+            if (idAffairePrm > 0 && idAffairePrm <= 999999999) {
+                //On regarde si cet affaire est déjà dans les affaires liés
+                panelAffairesLiees.value = [0]
+                let bTrouve = false
+                for (let i=0; i<lesDatas.document.affairesLiees.length; i++) {
+                    if (lesDatas.document.affairesLiees[i].id == idAffairePrm) {
+                        bTrouve = true
+                        break
+                    }
+                }
+                if (!bTrouve) {
+                    console.log(`go glèglè pour lier l'affaire ' ${idAffairePrm}`)
+                    /*
+                    const objetInfo = await objetInfoParId(idObjetPrm)
+                    if (objetInfo.length == 1) {
+                        const oObjetLiePlus = {
+                            "id": objetInfo[0].id,
+                            "type": objetInfo[0].type,
+                            "nom": objetInfo[0].nom,
+                        }
+                        lesDatas.document.objetsLies.push(oObjetLiePlus)
+                        idObjetLieAjout.value = ''
+                    } else {
+                        lesDatas.messagesErreur.timeOutSnackbar = 10000
+                        lesDatas.messagesErreur.bSnackbar = true
+                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjetPrm} n'existe pas`
+                    }
+                    */
+                }    
+            }
+        }        
+    }
+}
+
+const supprimeLienAffaire = (index) => {
+    lesDatas.document.affairesLiees.splice(index, 1)
+}
+
 const choixEmployesDroitConsultation = (modeChoix) => {
     modeChoixEmployeDC.value = modeChoix
     document.getElementById("btnActiveCardChoixEmployeDC").click() 
@@ -1543,7 +1790,8 @@ onMounted(async () => {
         for (let i=0; i<objetslies.value.length; i++) {
             ajoutObjetLie(objetslies.value[i])    
         }
-    } 
+    }
+
 })
 
 const verifieNouveauSHA256 = async () => {

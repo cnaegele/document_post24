@@ -35,6 +35,9 @@
       :auteuremploye="lesDatasIni.auteuremploye"
       :auteursacteur="lesDatasIni.auteursacteur"
       :objetslies="lesDatasIni.objetslies"
+      :documentsliesedit="lesDatasIni.documentsliesedit"
+      :documentslies="lesDatasIni.documentslies"
+      :affaireslieesedit="lesDatasIni.affaireslieesedit"
       :idniveauconfidentialite="lesDatasIni.idniveauconfidentialite"
       :sizemax="lesDatasIni.sizemax"
       :suitesauve="suiteSauveDP"
@@ -110,6 +113,9 @@ const lesDatasIni = ref(
     auteuremploye: '', // exemple: 7
     auteursacteur: [], // exemple: [10000,10001]  
     objetslies: [],    // exemple: [1000,10000]
+    documentsliesedit: 'oui',
+    documentslies: [],  // exemple: [1000000,2000011]
+    affaireslieesedit: 'oui', //temporaire pour dev, mais normalement lien avec affaire depuis interface affaire
     idniveauconfidentialite: '1',
     sizemax: 10000000,
   }
