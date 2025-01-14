@@ -389,10 +389,10 @@
                                     </template>        
                                 </v-tooltip>
                             </v-col>
-                            <v-col cols="12" md="3">
+                            <v-col cols="12" md="8">
                                 {{ affaireliee.nom }}
                             </v-col>
-                            <v-col cols="12" md="8">
+                            <v-col cols="12" md="3">
                                 {{ affaireliee.type }}
                             </v-col>
                         </v-row>
@@ -805,6 +805,7 @@ import { storedatadoc } from '@/stores/data.js'
 import { documentPostProps } from '@/components/DocumentPostProps.js'
 import { documentListeParSHA256, documentInfoParId, uploadFile, getDicoNiveauConfidentialite } from '@/axioscalls.js'
 import { objetInfoParId } from '@/axioscalls_objet.js'
+import { affaireInfoParId } from '@/axioscalls_affaire.js'
 import { employeInfoParId } from '@/axioscalls_employe.js'
 import { acteurInfoParId } from '@/axioscalls_acteur.js'
 import EmployeChoix from '@/components/employe/EmployeChoix.vue'
@@ -1430,23 +1431,34 @@ const ajoutAffaireLiee = async (idAffairePrm) => {
                     }
                 }
                 if (!bTrouve) {
-                    console.log(`go glèglè pour lier l'affaire ' ${idAffairePrm}`)
-                    /*
-                    const objetInfo = await objetInfoParId(idObjetPrm)
-                    if (objetInfo.length == 1) {
-                        const oObjetLiePlus = {
-                            "id": objetInfo[0].id,
-                            "type": objetInfo[0].type,
-                            "nom": objetInfo[0].nom,
+                    const affaireInfo = await affaireInfoParId(idAffairePrm)
+                    //console.log(affaireInfo)
+                    if (affaireInfo.length == 1) {
+                        const bTermine = affaireInfo[0].btermine
+                        const bSuspens = affaireInfo[0].btermine
+                        if (bTermine === 0 && bSuspens === 0) {
+                            const oAffaireLieePlus = {
+                                "id": affaireInfo[0].id,
+                                "type": affaireInfo[0].type,
+                                "nom": affaireInfo[0].nom,
+                            }
+                            lesDatas.document.affairesLiees.push(oAffaireLieePlus)
+                            idAffaireLieeAjout.value = ''
+                        } else { 
+                            lesDatas.messagesErreur.timeOutSnackbar = 10000
+                            lesDatas.messagesErreur.bSnackbar = true
+                             if (bSuspens !== 0) {
+                                lesDatas.messagesErreur.messageSnackbar = `l'affaire id:${idAffairePrm} "${affaireInfo[0].nom}" est en suspens, il n'est pas possible d'y ajouter un document lié`
+                            }
+                            if (bTermine !== 0) {
+                                lesDatas.messagesErreur.messageSnackbar = `l'affaire id:${idAffairePrm} "${affaireInfo[0].nom}" est terminée, il n'est pas possible d'y ajouter un document lié`
+                            }
                         }
-                        lesDatas.document.objetsLies.push(oObjetLiePlus)
-                        idObjetLieAjout.value = ''
                     } else {
                         lesDatas.messagesErreur.timeOutSnackbar = 10000
                         lesDatas.messagesErreur.bSnackbar = true
-                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjetPrm} n'existe pas`
+                        lesDatas.messagesErreur.messageSnackbar = `l'affaire id:${idAffairePrm} n'existe pas`
                     }
-                    */
                 }    
             }
         }        

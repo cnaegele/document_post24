@@ -115,7 +115,7 @@ const lesDatasIni = ref(
     objetslies: [],    // exemple: [1000,10000]
     documentsliesedit: 'oui',
     documentslies: [],  // exemple: [1000000,2000011]
-    affaireslieesedit: 'oui', //temporaire pour dev, mais normalement lien avec affaire depuis interface affaire
+    affaireslieesedit: 'non',
     idniveauconfidentialite: '1',
     sizemax: 10000000,
   }
@@ -158,6 +158,9 @@ if (propsIni.hasOwnProperty("idniveauconfidentialite")) {
 }
 if (propsIni.hasOwnProperty("sizemax")) {
     lesDatasIni.value.sizemax = propsIni.sizemax
+}
+if (propsIni.hasOwnProperty("affaireslieesedit")) {
+    lesDatasIni.value.affaireslieesedit = propsIni.affaireslieesedit
 }
 
 if (configIni !== null) {
