@@ -36,8 +36,9 @@ export const storedatadoc = defineStore({
             documentsLies: ref([]),
             /*
                 id: ref(0),
-                idTypeLien : ref(0),
+                idtypelien : ref(0),
                 nom: ref(''),
+                famille: ref('')
                 typeLien: ref('')
             */
             affairesLiees: ref([]),

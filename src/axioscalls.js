@@ -34,6 +34,16 @@ export async function documentListeParSHA256(strSHA256) {
     return response.data
 }
 
+export async function documentInfoParId(idDocument) {
+    const urldii = `${g_devurl}${g_pathurldocument}document_info_parid.php`
+    const params = new URLSearchParams([['iddocument', idDocument]])
+    const response = await axios.get(urldii, { params })
+        .catch(function (error) {
+            return traiteAxiosError(error)
+        })
+    return response.data
+}
+
 export async function uploadFile(formData) {
     const urlpodo = `${g_devurl}${g_pathurldocument}document_post.php`
     console.log(`in [async function uploadFile(formData)] url: ${urlpodo}`)

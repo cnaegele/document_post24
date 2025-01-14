@@ -320,11 +320,23 @@
                                     </template>        
                                 </v-tooltip>
                             </v-col>
-                            <v-col cols="12" md="3">
+                            <v-col cols="12" md="1">
+                                <v-tooltip text="voir le contenu du document">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        v-bind="props"
+                                        icon="mdi-file-outline"
+                                        variant="text"
+                                        @click="voirContenuDocumentLie(documentlie.id)"
+                                        ></v-btn>
+                                    </template>        
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="12" md="7">
                                 {{ documentlie.nom }}
                             </v-col>
-                            <v-col cols="12" md="8">
-                                {{ documentlie.typelien }}
+                            <v-col cols="12" md="3">
+                                {{ documentlie.famille }}
                             </v-col>
                         </v-row>
                     </v-container>
@@ -791,7 +803,7 @@ import { ref, onMounted, toRefs, watch } from 'vue'
 import { storeuser } from '@/stores/user.js'
 import { storedatadoc } from '@/stores/data.js'
 import { documentPostProps } from '@/components/DocumentPostProps.js'
-import { documentListeParSHA256, uploadFile, getDicoNiveauConfidentialite } from '@/axioscalls.js'
+import { documentListeParSHA256, documentInfoParId, uploadFile, getDicoNiveauConfidentialite } from '@/axioscalls.js'
 import { objetInfoParId } from '@/axioscalls_objet.js'
 import { employeInfoParId } from '@/axioscalls_employe.js'
 import { acteurInfoParId } from '@/axioscalls_acteur.js'
@@ -1372,23 +1384,25 @@ const ajoutDocumentLie = async (idDocumentPrm) => {
                     }
                 }
                 if (!bTrouve) {
-                    console.log(`go glèglè pour lier le document ' ${idDocumentPrm}`)
-                    /*
-                    const objetInfo = await objetInfoParId(idObjetPrm)
-                    if (objetInfo.length == 1) {
-                        const oObjetLiePlus = {
-                            "id": objetInfo[0].id,
-                            "type": objetInfo[0].type,
-                            "nom": objetInfo[0].nom,
+                    const documentInfo = await documentInfoParId(idDocumentPrm)
+                    //console.log(documentInfo)
+                    if (documentInfo.length == 1) {
+                        //actuellement pas de possibilité de choix du type de lien.
+                        //Peut être modifié en édition
+                        const oDocumentLiePlus = {
+                            "id": documentInfo[0].id,
+                            "idtypelien": 1,
+                            "nom": documentInfo[0].nom,
+                            "famille": documentInfo[0].famille,
+                            "typelien": '',
                         }
-                        lesDatas.document.objetsLies.push(oObjetLiePlus)
-                        idObjetLieAjout.value = ''
+                        lesDatas.document.documentsLies.push(oDocumentLiePlus)
+                        idDocumentLieAjout.value = ''
                     } else {
                         lesDatas.messagesErreur.timeOutSnackbar = 10000
                         lesDatas.messagesErreur.bSnackbar = true
-                        lesDatas.messagesErreur.messageSnackbar = `l'objet id:${idObjetPrm} n'existe pas`
+                        lesDatas.messagesErreur.messageSnackbar = `le document id:${idDocumentPrm} n'existe pas`
                     }
-                    */
                 }    
             }
         }        
@@ -1590,6 +1604,20 @@ const sauveData = async () => {
         }
     }
 
+    const aIdDocumentsLies = []
+    if (lesDatas.document.documentsLies.length > 0) {
+        for (let i=0; i<lesDatas.document.documentsLies.length; i++) {
+            aIdDocumentsLies.push(lesDatas.document.documentsLies[i].id)   
+        }
+    }
+
+    const aIdAffairesLiees = []
+    if (lesDatas.document.affairesLiees.length > 0) {
+        for (let i=0; i<lesDatas.document.affairesLiees.length; i++) {
+            aIdAffairesLiees.push(lesDatas.document.affairesLiees[i].id)   
+        }
+    }
+
     const aIdEmployesDroitConsultation = []
     const aIdUnitesOrgDroitConsultation = []
     const aIdGroupesSecuriteDroitConsultation = []
@@ -1625,6 +1653,8 @@ const sauveData = async () => {
         idniveauconfidentialite: lesDatas.document.idNiveauConfidentialite,
         idacteurauteur: aIdActeurAuteur,
         idobjetslies: aIdObjetsLies,
+        iddocumentslies: aIdDocumentsLies,
+        idaffairesliees: aIdAffairesLiees,
         idEmployesDroitConsultation: aIdEmployesDroitConsultation,
         idUnitesOrgDroitConsultation: aIdUnitesOrgDroitConsultation,
         idGroupesSecuriteDroitConsultation: aIdGroupesSecuriteDroitConsultation,
@@ -1881,5 +1911,9 @@ async function calculateSHA256(file) {
         // Lire le fichier comme un ArrayBuffer
         reader.readAsArrayBuffer(file);
     })
+}
+
+const voirContenuDocumentLie = (iddocument) => {
+  window.open(`https://golux.lausanne.ch/goeland/document/document_view2.php?iddocument=${iddocument}`, "godocumentview")
 }
 </script>
