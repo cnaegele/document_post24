@@ -1458,7 +1458,7 @@ const ajoutAffaireLiee = async (idAffairePrm) => {
                         lesDatas.messagesErreur.timeOutSnackbar = 10000
                         lesDatas.messagesErreur.bSnackbar = true
                         lesDatas.messagesErreur.messageSnackbar = `l'affaire id:${idAffairePrm} n'existe pas`
-                    }
+                    } 
                 }    
             }
         }        

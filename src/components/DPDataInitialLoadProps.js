@@ -36,6 +36,18 @@ export const dpDataInitialLoadProps = {
             return ''
         } 
     },
+    familletitre: {
+        type: String,
+        default() {
+          return 'non'
+        } 
+    },
+    nomfichiertitre: {
+        type: String,
+        default() {
+            return 'non'
+        } 
+    },
     suitesauve: {
         type: String,
         default() {

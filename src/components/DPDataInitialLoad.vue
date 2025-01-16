@@ -80,6 +80,8 @@ const props = defineProps(dpDataInitialLoadProps)
 const { codeConfigIni } = toRefs(props)
 const { jsonConfigIni } = toRefs(props)
 const { suitesauve } = toRefs(props)
+const { nomfichiertitre } = toRefs(props)
+const { familletitre } = toRefs(props)
 
 const determineSuiteSauveDP = (suitesauve) => {
   let suiteSauveDP = 'init'
@@ -142,7 +144,7 @@ if (propsIni.hasOwnProperty("nomfichiertitre")) {
     lesDatasIni.value.nomfichiertitre = propsIni.nomfichiertitre
 }
 if (propsIni.hasOwnProperty("sujet")) {
-    lesDatasIni.value.sujet = propsIni.sujet
+  lesDatasIni.value.sujet = propsIni.sujet
 }
 if (propsIni.hasOwnProperty("auteuremploye")) {
     lesDatasIni.value.auteuremploye = propsIni.auteuremploye
@@ -191,6 +193,13 @@ if (configIni !== null) {
 //Modification de la propriété suitesauve, il faut adapter la propriété suitesauve de DocumentPost
 watch(() => props.suitesauve, (newVal, oldVal) => {
   suiteSauveDP.value = determineSuiteSauveDP(newVal)
+})
+watch(() => props.nomfichiertitre, (newVal, oldVal) => {
+  lesDatasIni.value.nomfichiertitre = newVal
+})
+watch(() => props.familletitre, (newVal, oldVal) => {
+  lesDatasIni.value.familletitre = newVal
+  console.log(newVal)
 })
 
 const docsResponseData = []
