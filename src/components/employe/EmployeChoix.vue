@@ -258,4 +258,5 @@ const supprimeChoix = (idemploye) => {
 const choixTermine = () => {
   emit('choixEmploye', 0, JSON.stringify(employesListeChoisi.value))
   employesListeChoisi.value = [] 
-}</script>
+}
+</script>
