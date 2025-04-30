@@ -1,5 +1,6 @@
 <?php
 require_once 'gdt/cldbgoeland.php';
+require_once 'gdt/utf8go.php';
 header("Access-Control-Allow-Origin: *");
 $bParamsOk = true;
 if (isset($_GET['jsoncriteres'])) {
@@ -47,6 +48,7 @@ if ($bParamsOk) {
         if ($crtype == 'nomdebut') {
             $bnomdebut = '1';
         }
+        $critere = utf8go_decode($critere);
         $sSql = "cn_acteur_liste '$critere', $bnomdebut, $bacteurmoral, $bacteurphysique, $bacteurdesactive";
         if ($nombreMaximumRetour != '') {
             $sSql .= ", $nombreMaximumRetour";
