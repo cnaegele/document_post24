@@ -16,11 +16,12 @@ if (isset($_GET['jsoncriteres'])) {
         $nombreMaximumRetour = '100';
         if (isset($oCriteres->nombremaximumretour)) {
             $nombreMaximumRetour = $oCriteres->nombremaximumretour;
-            if (ctype_digit($nombreMaximumRetour) || is_int($nombreMaximumRetour)) {
-                if ($nombreMaximumRetour < 0 || $nombreMaximumRetour > 999999) {
-                    $nombreMaximumRetour = '100';
-                }
-            } else {
+            if (filter_var($nombreMaximumRetour, FILTER_VALIDATE_INT, [
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 999999
+                    ]
+                ]) === false) {
                 $nombreMaximumRetour = '100';
             }
         }
