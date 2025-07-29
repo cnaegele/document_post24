@@ -269,7 +269,7 @@ if (userInfo.hasOwnProperty('id_employe')) {
     } 
     return aActeurDCompl
   }
-  acteurDCompl = transformActeurDCompl(acteurDataComplement)
+  acteurDCompl = transformActeurDCompl(acteurDataComplement.value)
   //console.log(acteurDCompl)
 
   //Rôles
