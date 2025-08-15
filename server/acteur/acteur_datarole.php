@@ -1,5 +1,6 @@
 <?php
 require_once 'gdt/cldbgoeland.php';
+require 'gdt/gautentificationf5.php';
 header("Access-Control-Allow-Origin: *");
 $bParamsOk = false;
 if (isset($_GET['idacteur'])) {
@@ -11,18 +12,13 @@ if (isset($_GET['idacteur'])) {
         }
     }
 }
-if (isset($_GET['idemploye'])) {
-    $idEmploye = $_GET['idemploye'];
-} else {
-    $idEmploye = '0';
-}
-$pattern = '/^\d+$/';
-if (strlen($idActeur) > 10 || !preg_match($pattern, $idEmploye)) {
-    $bPrmIdActeurOk = false;
+$idCaller = 0;
+if (array_key_exists('empid', $_SESSION)) {
+    $idCaller = $_SESSION['empid'];
 }
 
 if ($bPrmIdActeurOk) {
-    $sSql = "cn_acteur_datarole $idActeur, $idEmploye";
+    $sSql = "cn_acteur_datarole $idActeur, $idCaller";
     //echo '{"message": "' . str_replace('"', '\"', $sSql) . '"}';
     $dbgo = new DBGoeland();
     $bret = $dbgo->queryRetJson2($sSql);
